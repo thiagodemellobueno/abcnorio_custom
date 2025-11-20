@@ -1,6 +1,19 @@
 ---
-import { Picture } from 'astro:assets';
+ import  from 'asciify-image,';
+ import { Picture } from 'astro:assets';
 import { Debug } from 'astro:components';
 const { component, innerBlocks, attributes } = Astro.props;
+let asciimg = asciify(attributes.url, 
+{
+    fit: 'box',
+    width: 450,
+    height: 200
+}).then ( ()=> {
+    console.log( asciimg );
+}).catch( (error) => {
+    console.error(error);
+})
+
 ---
+
 <Picture src={attributes.url} width={attributes.width} height={attributes.height} formats={['jpeg', 'webp']} alt={attributes.alt} />

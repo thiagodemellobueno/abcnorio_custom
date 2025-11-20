@@ -1,0 +1,5 @@
+---
+const { component, innerBlocks, attributes } = Astro.props;
+
+---
+<li class="list-item" set:html={attributes.content} />

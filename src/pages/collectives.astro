@@ -1,0 +1,32 @@
+---
+import Layout from "../layouts/index.astro";
+import Collectives from "../components/listings/collectives.astro";
+import figlet from 'figlet';
+
+const rest_base = import.meta.env.REST_API;
+const res = await fetch(`${rest_base}collectives`);
+const collectives = await res.json();
+
+async function renderText(text) {
+  const asciiHeader = await figlet.text(text, {
+    font: "BlurVision ASCII"
+  });
+  return asciiHeader;
+  console.log(text);
+}
+
+---
+
+<Layout title="Collectives!">
+  <div class="ascii-header">
+    <h2><span class="sr-only">Collective</span><pre>{ renderText("Collectives") }</pre></h2>
+  </div>
+  <Collectives collectives={collectives} />
+</Layout>
+<style>
+  h2 {
+    font-size: 6px;
+  }
+</style>
+
+

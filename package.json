@@ -9,6 +9,28 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.15.3"
+    "@astro-community/astro-embed-youtube": "^0.5.7",
+    "@astrojs/partytown": "^2.1.4",
+    "@astrojs/react": "^4.4.2",
+    "@iconify-json/mdi": "^1.2.3",
+    "@types/react": "^19.2.6",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^5.15.3",
+    "astro-icon": "^1.1.5",
+    "astro-mail-obfuscation": "^2.3.4",
+    "figlet": "^1.9.4",
+    "file-saver": "^2.0.5",
+    "ics": "^3.8.1",
+    "react": "^19.2.0",
+    "react-add-to-calendar": "^0.1.5",
+    "react-add-to-calendar-hoc": "^1.0.10",
+    "react-dom": "^19.2.0",
+    "scss-reset": "^1.4.6"
+  },
+  "devDependencies": {
+    "sass": "^1.93.3",
+    "stylelint": "^16.25.0",
+    "stylelint-config-recommended-scss": "^16.0.2",
+    "stylelint-config-standard": "^39.0.1"
   }
 }

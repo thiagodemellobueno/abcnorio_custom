@@ -1,0 +1,47 @@
+---
+const { event } = Astro.props; 
+const urlParts = [];
+const isMobile = true;
+---
+<add-to-calendar-button
+    data-start={event.start}
+    data-end={event.end}
+    data-url={event.url}
+    data-location={event.location}
+    data-title={event.title}
+    data-description={event.description}>
+    <button>Add to Calendar</button>
+    <button class="atc-google">Add to Google</button>
+    <!-- <button class="atc-apple">Add to Apple</button>
+    <button class="atc-outlook">Add to Outlook</button> -->
+
+</add-to-calendar-button>
+        <!-- data-time-zone="EST" -->
+
+<script>
+    import { downloadICS, generateGoogleLink } from './utils/generateLinks.js';
+
+    class AddToCalendar extends HTMLElement {
+        constructor() {
+            super();
+            const button = this.querySelector('button');
+            const googleButton = this.querySelector('button.atc-google');
+            const event = Object.assign( {}, this.dataset );
+            if ( event.start ) event.start = event.start.split(',').toString();
+            if ( event.end ) event.end = event.end.split(',').toString();
+            delete event.astroSourceFile; // boo, hack, boo
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                downloadICS(event);
+            });
+            googleButton.addEventListener('click', async(e) => {
+                e.preventDefault();
+                let calLink = await generateGoogleLink(event);
+                window.open( calLink, '_blank' );
+            });
+        }
+    }
+
+    customElements.define('add-to-calendar-button', AddToCalendar);
+
+</script>

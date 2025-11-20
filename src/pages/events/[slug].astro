@@ -1,0 +1,124 @@
+---
+import Layout from '../../layouts/event.astro';
+import Block from '../../components/wp-blocks/generic-block.astro';
+import ATC from '../../components/AddToCalendar/AddToCalendar.astro';
+
+import {
+  BLOCKS_API,
+  REST_API,
+  getSecret
+} from 'astro:env/server'
+
+// define vars are available in the template
+const { slug, APIURL } = Astro.params;
+const { event, acf, url, title, display_date, display_time, sd, ed } = Astro.props;
+
+const REST_API = getSecret("REST_API");
+const BLOCKS_API = getSecret("BLOCKS_API");
+
+// get the content
+const contentPath = `${REST_API}events/?slug=${slug}`; 
+let contentRes = await fetch(contentPath);
+let [post] = await contentRes.json();
+
+// get the structured data out of the block editor
+const blocksPath = `${BLOCKS_API}posts/${post.id}/blocks`;
+let blocksRes = await fetch(blocksPath);
+let blocks = await blocksRes.json(); 
+
+
+// Automatically build pages for the collectives
+// The getStaticPaths() is required for static Astro sites.
+export async function getStaticPaths() {
+  // I can't figure out how to access the scope to use variables here..... 
+  let data = await fetch(`http://localhost:10008/wp-json/wp/v2/events`);
+  let events = await data.json();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+  let parseDate = (aDate) => {
+      let d = new Date(aDate);
+      let year = d.getUTCFullYear();
+      let month =(d.getUTCMonth() + 1).toString().padStart(2, '0');
+      let date = d.getUTCDate().toString().padStart(2, '0');
+      let hours = d.getUTCHours().toString().padStart(2, '0');
+      let minutes = d.getUTCMinutes().toString().padStart(2, '0');
+      let ampm = ( hours < 12 ) ? "AM" : "PM";
+      let weekday = d.getDay();
+      
+      return {
+        year: year.toString(),
+        month:  month,
+        date: date,
+        hours: hours,
+        minutes: minutes,
+        ampm: ampm,
+        display_month: months[month],
+        display_hours: ( hours > 12 )? hours - 12 : hours,
+        display_minutes: minutes < 10 ? `0${minutes}` : minutes,
+        weekday: weekdays[weekday],
+      }
+  }
+
+  return events.map((post:any) => {
+    const sd = parseDate(post.acf.start);
+    const ed = parseDate(post.acf.end);
+    return {
+      params: { slug: post.slug },
+      props: {
+        title: post.title.rendered,
+        content: post,
+        display_date: `${ sd.weekday }, ${ sd.display_month }, ${ sd.date }, ${ sd.year }`,
+        display_time: `@ ${ sd.display_hours }:${ sd.display_minutes } ${sd.ampm } - ${ ed.display_hours }:${ ed.display_minutes } ${ ed.ampm }`,
+        url: Astro.url,
+        acf: post.acf,
+        event: {
+          title: post.title.rendered,
+          start: `${sd.year}${sd.month}${sd.date}T${sd.hours}${sd.minutes}00`,
+          end: `${ed.year}${ed.month}${ed.date}T${ed.hours}${ed.minutes}00`,
+          location: post.acf.location,
+          url: Astro.url,
+          description: post.excerpt.rendered
+        }
+      }
+    }
+  });
+}
+
+---
+<Layout title={title}>
+  <article>
+    <header>
+      <time>
+        <div>{ display_date }</div>
+        <div>{ display_time }</div>
+      </time>
+        { acf.location && (
+          <div class="location">
+            { acf.location }
+          </div>
+        )}
+        { acf.organizer_email && (
+          <div class="contact">
+              <a href={'mailto:'+acf.organizer_email} data-obfuscation="1">Contact Organizer</a>
+          </div>
+        )}
+        
+        <ATC event={event}></ATC>
+    </header>
+    { blocks.blocks.map( (block) => (
+        <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks || null} />
+      ))}
+  </article>
+
+</Layout>
+<style>
+  header {
+    .location {
+      margin-bottom: 1rem;
+    }
+    .contact {
+      margin-bottom: 2rem;
+    }
+  }
+</style>

@@ -1,0 +1,41 @@
+ @charset "UTF-8";
+ @use "sass:map";
+ // inconsolata font
+ // @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap');
+ // courier
+ @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Inconsolata:wght@200..900&display=swap');
+
+ $type-ratios: (
+  "minorSecond": 1.067,
+  "majorSecond": 1.125,
+  "minorThird": 1.2,
+  "majorThird": 1.25,
+  "perfectFourth": 1.333,
+  "augmentedFourth": 1.414,
+  "perfectFifth": 1.5,
+  "goldenRatio": 1.618,
+);
+
+$heading-levels: 4,3,2,1;
+$type-base: 16;
+$type-size-ratio: map.get($type-ratios, perfectFourth);
+
+body {
+    font-size: 16px;
+    color: #0f0;
+    color: #222;
+    font-family: "Courier Prime", monospace;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+@each $level in $heading-levels {
+$size: $level * $type-size-ratio * $type-base;
+h#{$level} {
+    font-size: $size;
+    line-height: calc(2px + 2ex + 2px);
+    margin-bottom: 0.65em;
+}
+}
+

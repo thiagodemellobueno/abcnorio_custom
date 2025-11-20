@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/index.astro";
+import Events from "../components/listings/events.astro";
+const rest_base = import.meta.env.REST_API;
+const res = await fetch(`${rest_base}events`);
+const events = await res.json();
+---
+
+<Layout title="Collectives!">
+  <Events events={events} />
+</Layout>
+
+

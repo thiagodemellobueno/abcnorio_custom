@@ -1,16 +1,29 @@
 ---
+import Layout from '/src/layouts/index.astro';
+import Collectives from '/src/components/listings/collectives.astro';
+import Events from '/src/components/listings/events.astro';
+import { Debug } from 'astro:components';
 
+const REST_API = import.meta.env.REST_API;
+// posts
+const posts_res = await fetch(`${REST_API}posts`);
+const posts = await posts_res.json();
+// collectives
+const collectives_res = await fetch(`${REST_API}collectives`);
+const collectives = await collectives_res.json();
+// // events
+const events_res = await fetch(`${REST_API}events`);
+const events = await events_res.json();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title={posts[0].title.rendered}>
+  
+  <section>
+    <h2><a href="/collectives">Collectives/</a></h2>
+    <Collectives collectives={collectives} />
+  </section>
+  <section>
+    <h2><a href="/events">Events/</a></h2>
+    <Events events={events} />    
+  </section>
+</Layout>

@@ -1,0 +1,16 @@
+---
+import Head from './partials/head.astro';
+import Header from '../components/Header.astro';
+
+const { title } = Astro.props;
+---
+<html lang="en">
+  <Head/>
+  <body>
+    <Header />
+    <h1>{title}</h1>
+    <article>
+      <slot /> <!-- your content is injected here -->
+    </article>
+  </body>
+</html>

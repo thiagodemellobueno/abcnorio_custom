@@ -1,0 +1,50 @@
+ @charset "UTF-8";
+@use 'scss-reset';
+@use './tokens/typography';
+
+body {
+    box-sizing: border-box;
+    background-color: #111;
+    color: #0f4;
+    border: 1rem #1a1a1a solid;
+    padding: 2rem;
+    @media (min-width: 900px ) {
+        border-width: 4rem;
+        padding: 4rem;
+    }
+}
+
+:global(a),
+:global(a:visited) {
+    color: #0f0;
+    text-decoration: underline;
+}
+
+// for screen readers
+:global(.sr-only) {
+    position: fixed;
+    left: 100vw;
+    top: 100vh;
+    width: 0;
+    height: 0;
+    overflow: auto;
+}
+
+:global(.atcb-button),
+:global(button) {
+    border-radius: 0;
+    outline: none;
+    font: inherit;
+    border: 2px #090 solid;
+    background: #000;
+    color: #0c0;
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    &:focus,
+    &:hover {
+        border-color: #0f0;
+        background-color: #0f0;
+        color: #222;
+    }
+}

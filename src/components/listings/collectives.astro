@@ -1,0 +1,21 @@
+---
+import Teaser from "/src/components/teasers/collective.astro";
+const { collectives } = Astro.props;
+---
+<style>
+  .collectives {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    @media (min-width: 900px ) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+</style>
+<section class="collectives">
+    {
+      collectives.map((collective:any) => (
+        <Teaser collective={collective} />
+      ))
+    }
+  </section>

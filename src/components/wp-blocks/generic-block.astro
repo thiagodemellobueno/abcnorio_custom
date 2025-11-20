@@ -1,0 +1,45 @@
+---
+// A generic block component, for rendering structured data from the WP Block API
+import { Debug } from 'astro:components';
+import Paragraph from './paragraph.astro';
+import Quote from './quote.astro';
+import Image from './image.astro';
+import List from './list.astro';
+import ListItem from './list-item.astro';
+import Gallery from './gallery.astro';
+import YouTube from './youtube.astro';
+
+let { component, attributes, innerBlocks } = Astro.props;
+
+// Default to the Debug Component
+// see https://docs.astro.build/en/reference/astro-syntax/#dynamic-tags
+let Component = Debug; 
+switch (component) {
+    case 'core/paragraph':
+        Component = Paragraph;
+    break;
+    case 'core/image':
+        Component = Image;
+    break;
+    case 'core/quote':
+        Component = Quote;
+    break;
+    case 'core/list':
+        Component = List;
+    break;
+    case 'core/list-item':
+        Component = ListItem;
+    break;
+    case 'core/gallery':
+        Component = Gallery;
+    break;
+    case 'core/embed':
+        switch(attributes.providerNameSlug) {
+            case "youtube":
+                Component = YouTube;
+            break;
+        }
+    break;
+} 
+---
+<Component attributes={attributes} component={component} innerBlocks={innerBlocks||null} />

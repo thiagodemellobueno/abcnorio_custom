@@ -1,0 +1,16 @@
+---
+import Block from '../../components/wp-blocks/generic-block.astro';
+import { Debug } from 'astro:components';
+
+const { component, innerBlocks, attributes } = Astro.props;
+
+---
+<aside class="quote">
+{
+
+
+    (innerBlocks != null) && innerBlocks.map( (innerBlock) => (
+        <Block component={innerBlock.name} attributes={innerBlock.attributes} innerBlocks={innerBlock.innerBlocks || null} />
+    ))
+}
+</aside>

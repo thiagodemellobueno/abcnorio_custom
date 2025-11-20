@@ -1,0 +1,35 @@
+---
+import Block from '/src/components/wp-blocks/generic-block.astro';
+
+const { component, innerBlocks, attributes } = Astro.props;
+---
+<style>
+    .gallery {
+        display: block;
+        overflow: hidden;
+        overflow-x: auto;
+        .images {
+            display: flex;
+            flex-wrap: nowrap;
+            picture {
+                display: block;
+                width: auto;
+                height: 400px;
+                img {
+                    display: block;
+                    height: 100%;
+                    width: auto;
+                }
+            }
+        }
+    }
+</style>
+<section class="gallery">
+    <div class="images">
+{ 
+    (innerBlocks.length) && innerBlocks.map( (block) => (
+        <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks || null} />
+    ))
+}    
+    </div>
+</section>

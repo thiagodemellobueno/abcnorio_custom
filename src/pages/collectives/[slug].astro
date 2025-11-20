@@ -1,0 +1,48 @@
+---
+import Layout from '/src/layouts/collective.astro';
+import Block from '/src/components/wp-blocks/generic-block.astro';
+
+import {
+  BLOCKS_API,
+  REST_API,
+  getSecret
+} from 'astro:env/server'
+
+import { Debug } from 'astro:components';
+
+// define vars are available in the template
+const { slug, APIURL } = Astro.params;
+
+const REST_API = getSecret("REST_API");
+const BLOCKS_API = getSecret("BLOCKS_API");
+
+// get the content
+const contentPath = `${REST_API}collectives/?slug=${slug}`; 
+let contentRes = await fetch(contentPath);
+let [post] = await contentRes.json();
+
+// get the structured data out of the block editor
+const blocksPath = `${BLOCKS_API}posts/${post.id}/blocks`;
+let blocksRes = await fetch(blocksPath);
+let blocks = await blocksRes.json(); 
+
+// Automatically build pages for the collectives
+// The getStaticPaths() is required for static Astro sites.
+export async function getStaticPaths({ routePattern }) {
+  // I can't figure out how to access the scope to use variables here..... 
+  let data = await fetch(`http://localhost:10008/wp-json/wp/v2/collectives`);
+  let posts = await data.json();
+  return posts.map((post:any) => ({
+    params: { slug: post.slug },
+    props: { post: post },
+  }));
+}
+
+---
+<Layout title={post.title.rendered}>
+  <article>
+    { blocks.blocks.map( (block) => (
+        <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks || null} />
+      ))}
+  </article>
+</Layout>

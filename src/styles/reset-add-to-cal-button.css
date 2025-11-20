@@ -1,0 +1,5 @@
+  add-to-calendar-button#css-part-example::part(atcb-button),
+  #atcb-btn-css-part-example-modal-host::part(atcb-button) {
+    background-color: #264f3c;
+    color: #fff;
+  }

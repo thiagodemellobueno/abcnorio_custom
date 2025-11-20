@@ -1,0 +1,6 @@
+---
+import { Picture } from 'astro:assets';
+import { Debug } from 'astro:components';
+const { component, innerBlocks, attributes } = Astro.props;
+---
+<Picture src={attributes.url} width={attributes.width} height={attributes.height} formats={['jpeg', 'webp']} alt={attributes.alt} />

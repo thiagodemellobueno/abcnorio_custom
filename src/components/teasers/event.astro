@@ -1,0 +1,53 @@
+---
+const {event} = Astro.props;
+const startDate = new Date( event.acf.start );
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+const start = {
+    m:  startDate.getMonth(),
+    d: startDate.getDate(),
+    wk: weekdays[startDate.getDay()],
+    y: startDate.getYear().toString().substr(1,4),
+    hr: startDate.getHours() < 13 ? startDate.getHours() : startDate.getHours() - 12,
+    min: startDate.getMinutes() < 10 ? `0${startDate.getMinutes().toString()}` : startDate.getMinutes()
+}
+---
+<article class="events">
+    <a href={`/events/${event.slug}`}>
+        <time>
+        { start.wk }, { months[start.m] }, { start.d }, { start.y }
+        @ { start.hr }:{ start.min }
+        </time>
+        <h2>{ event.title.rendered }</h2>
+        <div set:html={ event.excerpt && event.excerpt.rendered || 'excerpt' }></div>
+    </a>
+</article>
+<style>
+    article {
+        min-height: 5rem;
+        h2 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        a {
+            border: 1px #030 solid;
+            display: block;
+            padding: 0.875rem;
+            text-decoration: none;
+            font-size: 1rem;
+            color: #090;
+            &:focus,
+            &:hover {
+                color: #0f0;
+                border: 1px #0f0 solid;
+            }
+        }
+        @media (min-width: 900px ) {
+            a {
+                padding: 2rem;
+                font-size: 1.25rem;
+            }
+        }
+    }
+</style>

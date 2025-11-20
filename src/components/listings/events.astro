@@ -1,0 +1,22 @@
+---
+import Teaser from "/src/components/teasers/event.astro";
+import { Debug } from 'astro:components';
+const { events } = Astro.props;
+---
+<style>
+  .events {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    @media (min-width: 900px ) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+</style>
+<section class="events">
+    {
+      events.map((event:any) => (
+        <Teaser event={event} />
+      ))
+    }
+  </section>

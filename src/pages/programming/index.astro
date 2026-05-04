@@ -12,6 +12,7 @@ const post = await fetchWpPost(
   async () => { const e = await getEntry('pages', 'programming'); return (e as any)?.data ?? null; },
 );
 const blocks: any[] = post?.blocks ?? [];
+const seo = buildPostSeo({
   post,
   siteUrl: SITE_URL,
   pathname: '/programming/',

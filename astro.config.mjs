@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, fontProviders, memoryCache } from 'astro/config';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -146,4 +146,18 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+
+  security: {
+    checkOrigin: mode === 'production',
+  },
+
+  experimental: {
+    cache: {
+      provider: memoryCache({ max: 500 }),
+    },
+    routeRules: {
+      '/search/api': { maxAge: 60, swr: 60 },
+      '/events/listing': { maxAge: 30, swr: 60 },
+    },
+  },
 });

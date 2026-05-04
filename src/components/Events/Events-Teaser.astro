@@ -30,12 +30,14 @@ const excerpt = data?.excerpt?.rendered || 'excerpt';
 const featuredImage = data?.featured_image;
 const teaserImage = featuredImage?.url ?? '';
 const teaserImageAlt = featuredImage?.alt ?? '';
+const teaserImageWidth = featuredImage?.width ?? 640;
+const teaserImageHeight = featuredImage?.height ?? 360;
 
 ---
 <article class="teaser events">
     <a href={`/events/${slug}`}>
         {showTeaser && teaserImage && (
-            <img src={teaserImage} alt={teaserImageAlt} loading="lazy" decoding="async" />
+            <img src={teaserImage} alt={teaserImageAlt} width={teaserImageWidth} height={teaserImageHeight} loading="lazy" decoding="async" />
         )}
 
         <div class="content">

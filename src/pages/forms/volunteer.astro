@@ -1,0 +1,106 @@
+---
+export const prerender = false;
+import { actions, isInputError } from 'astro:actions';
+import Layout from '@layouts/page.astro';
+
+const result = Astro.getActionResult(actions.submitVolunteerForm);
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
+---
+<Layout title="Volunteer — ABC No Rio">
+    <section class="form-page">
+        <h1>Volunteer</h1>
+
+        <div id="form-result">
+            {result?.data?.success && (
+                <p role="status">Thanks for reaching out! We'll be in touch.</p>
+            )}
+
+            {result?.error && !isInputError(result.error) && (
+                <p role="alert">Something went wrong. Please try again.</p>
+            )}
+        </div>
+
+        <form method="POST" action={actions.submitVolunteerForm} novalidate>
+            <div class="field">
+                <label for="name">Name</label>
+                <input
+                    id="name"
+                    type="text"
+                    name="name"
+                    required
+                    aria-describedby={inputErrors.name ? 'name-error' : undefined}
+                    aria-invalid={inputErrors.name ? 'true' : undefined}
+                />
+                {inputErrors.name && (
+                    <p id="name-error" role="alert">{inputErrors.name.join(', ')}</p>
+                )}
+            </div>
+
+            <div class="field">
+                <label for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    required
+                    aria-describedby={inputErrors.email ? 'email-error' : undefined}
+                    aria-invalid={inputErrors.email ? 'true' : undefined}
+                />
+                {inputErrors.email && (
+                    <p id="email-error" role="alert">{inputErrors.email.join(', ')}</p>
+                )}
+            </div>
+
+            <div class="field">
+                <label for="message">Message</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    required
+                    minlength="30"
+                    rows="6"
+                    aria-describedby={inputErrors.message ? 'message-error' : undefined}
+                    aria-invalid={inputErrors.message ? 'true' : undefined}
+                ></textarea>
+                {inputErrors.message && (
+                    <p id="message-error" role="alert">{inputErrors.message.join(', ')}</p>
+                )}
+            </div>
+
+            <button type="submit">Send</button>
+        </form>
+    </section>
+</Layout>
+
+<script>
+import { actions, isInputError } from 'astro:actions';
+
+const form = document.querySelector('.form-page form');
+const result = document.getElementById('form-result');
+
+form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    result.classList.remove('fadein');
+    result.classList.add('hidden');
+
+    if (!result) return;
+
+    const { data, error } = await actions.submitVolunteerForm(new FormData(form));
+
+    if (data?.success) {
+        result.innerHTML = '<p role="status">Thanks for reaching out! We\'ll be in touch.</p>';
+        form.reset();
+        return;
+    }
+
+    if (isInputError(error)) {
+        result.innerHTML = '<p role="alert">Please check the fields below and try again.</p>';
+        return;
+    }
+
+    result.innerHTML = '<p role="alert">Something went wrong. Please try again.</p>';
+    result.classList.add('fadein');
+    result.classList.remove('hidden');
+});
+</script>

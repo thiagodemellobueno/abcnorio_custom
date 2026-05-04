@@ -43,7 +43,7 @@ Incremental, block-aware. Fetches all items, uses modified_gmt as a change signa
 ### wpSimpleLoader
 Full reload on every build, no blocks. Used for listing/taxonomy data.
 wpChildPagesLoader — variant of wpLoader that resolves a parent page slug first, then incrementally loads its child pages with blocks.
-- newsm, event_types, 
+- news_items, event_types, 
 
 ### wpChildPagesLoader
 Variant of wpLoader that resolves a parent page slug first, then incrementally loads its child pages with blocks.

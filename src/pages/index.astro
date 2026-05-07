@@ -10,10 +10,13 @@ import { SITE_URL, REST_PATH } from '@util/paths.js';
 import { getCollection } from 'astro:content';
 import { fetchData } from '@util/fetch-data.js';
 import { fetchWpJson } from '@util/wp-fetch.js';
+import { VENUE_TIMEZONE } from '@consts';
+
+const start_of_today = new Date().toLocaleString('sv', { timeZone: VENUE_TIMEZONE }).slice(0, 10) + ' 00:00:00';
 
 const [events, collectives, news] = await Promise.all([
   fetchData(
-    () => fetchWpJson(`${REST_PATH}events?per_page=10&order=asc`).catch(() => []),
+    () => fetchWpJson(`${REST_PATH}events?event_effective_end_after=${encodeURIComponent(start_of_today)}&per_page=5&orderby=event_start_date&order=asc`).catch(() => []),
     async () => (await getCollection('events')).map((e: any) => e.data),
   ),
   fetchData(

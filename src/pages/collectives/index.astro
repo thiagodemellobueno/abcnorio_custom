@@ -1,9 +1,32 @@
 ---
 export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'collectives'].includes(process.env.SCOPE || 'full');
 import Layout from "@layouts/landing.astro";
+import CollectiveTeaser from '@components/teasers/collective.astro';
+import Listing from '@components/Events/Homepage-Events-Listing.astro';
+
+import { SITE_URL, REST_PATH } from '@util/paths.js';
+import { getCollection } from 'astro:content';
+import { fetchData } from '@util/fetch-data.js';
+import { fetchWpJson } from '@util/wp-fetch.js';
+
+const [collectives] = await Promise.all([
+    fetchData(() => fetchWpJson(`${REST_PATH}collectives?per_page=50`).catch(() => []),
+    async () => (await getCollection('collectives')).map((e: any) => e.data),
+    )
+]);
 ---
 <Layout title="Collectives">
     <!-- loop through collectives, add little teasers here -->
+
+
+    <section>
+    <h3 style="font-family: var(--font-family-heading), sans-serif;">Collectives</h3>
+    <Listing
+    items={collectives}
+    teaserComponent={CollectiveTeaser}
+    />
+    <a href="/collectives" class="view-all-link">View collectives</a>
+    </section>
 </Layout>
 
 

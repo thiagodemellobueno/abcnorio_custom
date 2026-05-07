@@ -8,17 +8,20 @@ const { component, innerBlocks, attributes } = Astro.props;
         display: block;
         overflow: hidden;
         overflow-x: auto;
+        padding-top: 1rem;
+        margin-bottom: 2rem;
         .images {
-            display: flex;
-            flex-wrap: nowrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1rem;
+            object-fit: cover;
+            object-position: center top;
             img {
                 box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-                border: 0.75rem #eee solid;
                 display: block;
                 height: 500px;
                 width: auto;
-            }
+            } 
         }
     }
 </style>

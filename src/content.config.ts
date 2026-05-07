@@ -71,6 +71,54 @@ function wpSimpleLoader(fetchItems: () => Promise<any[]>): Loader {
 }
 
 /**
+ * Loader for all pages tagged with any parent_collective term.
+ * Fetches terms first to get their IDs, then queries pages in a single request.
+ */
+function wpCollectiveSubpagesLoader(): Loader {
+  return {
+    name: 'wp-collective-subpages',
+    load: async ({ store, generateDigest, logger }) => {
+      let terms: any[];
+      try {
+        terms = await fetchAllWpItems(`${REST_PATH}parent-collectives`);
+      } catch (err: any) {
+        logger.warn(`wp-collective-subpages: terms fetch failed — ${err.message}. Retaining existing store.`);
+        return;
+      }
+
+      if (!terms.length) return;
+
+      const termIds = terms.map((t: any) => t.id).join(',');
+
+      let items: any[];
+      try {
+        items = await fetchAllWpItems(`${REST_PATH}pages?parent-collectives=${termIds}`);
+      } catch (err: any) {
+        logger.warn(`wp-collective-subpages: pages fetch failed — ${err.message}. Retaining existing store.`);
+        return;
+      }
+
+      const seenIds = new Set<string>();
+
+      await Promise.all(
+        items.map(async (item: any) => {
+          const id = String(item.slug || item.id);
+          seenIds.add(id);
+          const digest = generateDigest(String(item.modified_gmt || item.modified || item.id));
+          if (store.get(id)?.digest === digest) return;
+          const blocks = await fetchPostBlocks(item.id);
+          store.set({ id, data: { ...item, blocks }, digest });
+        })
+      );
+
+      for (const key of store.keys()) {
+        if (!seenIds.has(key)) store.delete(key);
+      }
+    },
+  };
+}
+
+/**
  * Loader for child pages of a given parent slug.
  * Resolves the parent page id, then fetches and incrementally updates children.
  */
@@ -154,5 +202,10 @@ export const collections = {
   // Event taxonomy terms — used to resolve type labels on event pages.
   event_types: defineCollection({
     loader: wpSimpleLoader(() => fetchAllWpItems(`${REST_PATH}event-types`)),
+  }),
+
+  // Subpages for collectives — pages tagged with any parent_collective term.
+  collective_subpages: defineCollection({
+    loader: wpCollectiveSubpagesLoader(),
   }),
 };

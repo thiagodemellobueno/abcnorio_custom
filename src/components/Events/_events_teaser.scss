@@ -11,9 +11,8 @@ $teaser_bg: #eee;
 
     .content {
         position: absolute;
-        top: 2rem;
+        top: 3rem;
         left: 5rem;
-        max-width: 66.66666%;
         @media screen and (min-width: breakpoints.get-breakpoint(sm) ) and (max-width: breakpoints.get-breakpoint(lg)) {
             top: 3rem;
             max-width: 100%;
@@ -24,7 +23,7 @@ $teaser_bg: #eee;
         display: inline;
         position: relative;
         box-sizing: border-box;
-        max-width: fit-content;
+        max-width: max-content;
         margin-bottom: 1rem;
         padding: 0.25rem 0rem 0.25rem 0rem;
         transform: rotate3d( 0, 0, 1, -15deg);
@@ -33,6 +32,7 @@ $teaser_bg: #eee;
         font-family: "Geist Mono", monospace;
         font-family: var(--font-impact-label);
         font-size: 1.5rem;
+        line-height: 1.325;
 
     }
 
@@ -43,6 +43,7 @@ $teaser_bg: #eee;
         font-size: 16px;
         background-color: $teaser_bg;
         color: var(--color-text);
+        background-color: #ffbaba;
         padding: 1rem 1rem 1rem 0;
         font-weight: 400;
     }
@@ -54,10 +55,12 @@ $teaser_bg: #eee;
         overflow: hidden;
         font-size: 1rem;
         border: 0.5rem solid $teaser_bg;
-        transition-property: border, color, mix-blend-mode;
+        transition-property: box-shadow, border, color, mix-blend-mode;
         transition-duration: 0.175s;
         transition-timing-function: ease-out;
-        color: inherit;
+        color: inherit;    
+        box-shadow: 0.12rem 0.12rem 0.25rem rgba(0, 0, 0, 0.3);
+
 
         img {
             object-fit: cover;
@@ -71,16 +74,19 @@ $teaser_bg: #eee;
 
         &:focus,
         &:hover {
-            border: 1rem solid $teaser_bg;
+            border: 1rem solid var( --color-text);
+            box-shadow: 0.5rem 0.5rem 0.75rem rgba(0, 0, 0, 0.8);
 
             time {
                 color: var(--color-text);
+                background-color: white; //var(--color-link);
                 background-color: #ffbaba;
             }
 
             h3 {
                 background-color: var(--color-text);
                 color: $teaser_bg;
+                background-color: var(--color-text);
             }
 
             img {
@@ -98,10 +104,11 @@ $teaser_bg: #eee;
         aspect-ratio: 3 / 4;
         .content {
             left: 2rem;
+            transform: rotate(-7deg);
         }
 
         a {
-            border-width: 1rem;
+            border-width: 0rem;
             aside & {
                 border-width: 0rem;
                 .content {

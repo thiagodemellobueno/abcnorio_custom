@@ -104,7 +104,7 @@ export async function withChildPagesLeafPaths(
 }
 
 /**
- * Collectives index: join collectives to subpages via parent_collective terms.
+ * Collectives index: join collectives to subpages via collective_association terms.
  * Returns { params: { slug }, props: { post, subpages } }.
  * subpages are collective_subpages collection entries.
  * Use for: collectives/[slug]/index.astro
@@ -114,13 +114,13 @@ export async function collectiveIndexPaths(scope: string | undefined) {
   const [entries, allSubpages, terms] = await Promise.all([
     getCollection('collectives' as any),
     getCollection('collective_subpages' as any),
-    fetchAllWpItems(`${REST_PATH}parent-collectives`),
+    fetchAllWpItems(`${REST_PATH}collective-associations`),
   ]);
   const termSlugToId = new Map(terms.map((t: any) => [t.slug, t.id]));
   return entries.map((entry: any) => {
     const termId = termSlugToId.get(entry.id);
     const subpages = termId
-      ? allSubpages.filter((p: any) => p.data['parent-collectives']?.includes(termId))
+      ? allSubpages.filter((p: any) => p.data['collective-associations']?.includes(termId))
       : [];
     return {
       params: { slug: entry.id },
@@ -138,12 +138,12 @@ export async function collectiveSubpagePaths(scope: string | undefined) {
   if (!scopeAllowed(scope, 'collectives')) return [];
   const [allSubpages, terms] = await Promise.all([
     getCollection('collective_subpages' as any),
-    fetchAllWpItems(`${REST_PATH}parent-collectives`),
+    fetchAllWpItems(`${REST_PATH}collective-associations`),
   ]);
   const termIdToSlug = new Map(terms.map((t: any) => [t.id, t.slug]));
   return allSubpages
     .map((page: any) => {
-      const termId = page.data['parent-collectives']?.[0];
+      const termId = page.data['collective-associations']?.[0];
       const collectiveSlug = termIdToSlug.get(termId);
       if (!collectiveSlug) return null;
       return {

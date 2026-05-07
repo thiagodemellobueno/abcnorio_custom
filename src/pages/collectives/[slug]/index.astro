@@ -27,12 +27,12 @@ const collectiveTermId = post?.['collective-associations']?.[0];
 
 let subpages: any[] = (Astro.props as any).subpages ?? [];
 if (!subpages.length && slug) {
-  // SSR path: look up parent_collective term by collective slug, then fetch pages
+  // SSR path: look up collective_association term by collective slug, then fetch pages
   try {
-    const terms = await fetchWpJson(`${REST_PATH}parent-collectives?slug=${encodeURIComponent(slug)}`);
+    const terms = await fetchWpJson(`${REST_PATH}collective-associations?slug=${encodeURIComponent(slug)}`);
     const termId = terms?.[0]?.id;
     if (termId) {
-      const raw = await fetchAllWpItems(`${REST_PATH}pages?parent-collectives=${termId}&_fields=id,slug,title,link`);
+      const raw = await fetchAllWpItems(`${REST_PATH}pages?collective-associations=${termId}&_fields=id,slug,title,link`);
       subpages = raw.map((p: any) => ({ data: p }));
     }
   } catch (_) {}

@@ -71,7 +71,7 @@ function wpSimpleLoader(fetchItems: () => Promise<any[]>): Loader {
 }
 
 /**
- * Loader for all pages tagged with any parent_collective term.
+ * Loader for all pages tagged with any collective_association term.
  * Fetches terms first to get their IDs, then queries pages in a single request.
  */
 function wpCollectiveSubpagesLoader(): Loader {
@@ -80,7 +80,7 @@ function wpCollectiveSubpagesLoader(): Loader {
     load: async ({ store, generateDigest, logger }) => {
       let terms: any[];
       try {
-        terms = await fetchAllWpItems(`${REST_PATH}parent-collectives`);
+        terms = await fetchAllWpItems(`${REST_PATH}collective-associations`);
       } catch (err: any) {
         logger.warn(`wp-collective-subpages: terms fetch failed — ${err.message}. Retaining existing store.`);
         return;
@@ -92,7 +92,7 @@ function wpCollectiveSubpagesLoader(): Loader {
 
       let items: any[];
       try {
-        items = await fetchAllWpItems(`${REST_PATH}pages?parent-collectives=${termIds}`);
+        items = await fetchAllWpItems(`${REST_PATH}pages?collective-associations=${termIds}`);
       } catch (err: any) {
         logger.warn(`wp-collective-subpages: pages fetch failed — ${err.message}. Retaining existing store.`);
         return;
@@ -204,7 +204,7 @@ export const collections = {
     loader: wpSimpleLoader(() => fetchAllWpItems(`${REST_PATH}event-types`)),
   }),
 
-  // Subpages for collectives — pages tagged with any parent_collective term.
+  // Subpages for collectives — pages tagged with any collective_association term.
   collective_subpages: defineCollection({
     loader: wpCollectiveSubpagesLoader(),
   }),

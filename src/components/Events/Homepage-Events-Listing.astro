@@ -10,7 +10,9 @@ interface Props {
 const { items, teaserComponent, requiredProps = [] }: Props = Astro.props;
 
 const hasValue = (value: any) => value !== undefined && value !== null && value !== '';
+
 const readRequiredProp = (item: any, prop: string) => {
+
   if (prop === 'title') {
     return item?.title?.rendered;
   }

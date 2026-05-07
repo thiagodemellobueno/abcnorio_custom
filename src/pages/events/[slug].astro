@@ -7,6 +7,7 @@ import ATC from "../../components/AddToCalendar/AddToCalendar.astro";
 import { SITE_URL, REST_PATH } from "@util/paths.js";
 import { buildPostSeo } from "@util/seo.js";
 import { getCollection } from "astro:content";
+import { collectionPaths } from "@util/static-paths.js";
 import { fetchWpPost } from "@util/fetch-data.js";
 
 const { slug } = Astro.params;
@@ -125,18 +126,7 @@ if (startDate && endDate) {
 }
 
 export async function getStaticPaths() {
-  const scope = process.env.SCOPE || 'full';
-  if (scope !== 'full' && scope !== 'events') {
-    return [];
-  }
-
-  const entries = await getCollection('events');
-  return entries
-    .filter((entry: any) => entry.id)
-    .map((entry: any) => ({
-      params: { slug: entry.id },
-      props: { post: entry.data },
-    }));
+  return collectionPaths('events', process.env.SCOPE, 'events');
 }
 ---
 
@@ -160,37 +150,12 @@ export async function getStaticPaths() {
 
     {
       (venueName || venueAddress) && (
-        <div class="start-date">
+        <div class="venue-details">
           <strong>Venue details:</strong> {venueName && <h4>{venueName}</h4>}
           {venueAddress && <div>{venueAddress}</div>}
         </div>
       )
     }
-    <!-- {
-      location && (
-        <div class="location">
-          <strong>Venue:</strong> {location}
-        </div>
-      )
-    } -->
-    <!-- 
-    {
-      startFormatted && (
-        <div class="start-date">
-          <strong>Start:</strong> {startFormatted.dateLabel}{" "}
-          {startFormatted.timeLabel}
-        </div>
-      )
-    }
-
-    {
-      endFormatted && (
-        <div class="end-date">
-          <strong>End:</strong> {endFormatted.dateLabel}{" "}
-          {endFormatted.timeLabel}
-        </div>
-      )
-    } -->
   </header>
 
   <article slot="main">

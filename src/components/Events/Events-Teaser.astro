@@ -3,6 +3,7 @@ import "./_events_teaser.scss";
 const months  = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+
 function formatEventDate(raw: string): { datetime: string; label_date: string; label_time: string } | null {
     if (!raw) return null;
     const d = new Date(raw);
@@ -24,6 +25,8 @@ interface Props {
 const { data, showTeaser = true }: Props = Astro.props;
 const startRaw = data?.meta?.event_start_date ?? data?.acf?.event_start_date ?? '';
 const start = formatEventDate(startRaw);
+const endRaw = data?.meta?.event_end_date ?? data?.acf?.event_end_date ?? '';
+const end = formatEventDate(endRaw);
 const slug  = data?.slug || '';
 const title = data?.title?.rendered || slug || 'Untitled event';
 const excerpt = data?.excerpt?.rendered || 'excerpt';
@@ -32,9 +35,14 @@ const teaserImage = featuredImage?.url ?? '';
 const teaserImageAlt = featuredImage?.alt ?? '';
 const teaserImageWidth = featuredImage?.width ?? 640;
 const teaserImageHeight = featuredImage?.height ?? 360;
+let isPastEvent = start ? new Date(start.datetime) < new Date() : false;
+if( end?.datetime ) {
+    isPastEvent = new Date(end.datetime) < new Date();
+}
+
 
 ---
-<article class="teaser events">
+<article class={`teaser events ${isPastEvent ? 'past' : ''}`}>
     <a href={`/events/${slug}`}>
         {showTeaser && teaserImage && (
             <img src={teaserImage} alt={teaserImageAlt} width={teaserImageWidth} height={teaserImageHeight} loading="lazy" decoding="async" />
@@ -42,10 +50,7 @@ const teaserImageHeight = featuredImage?.height ?? 360;
 
         <div class="content">
             {start && 
-                <time datetime={start.label_time}>
-                    <div set:html={start.label_date}></div>
-                    <div set:html={`@ ${start.label_time}`}></div>
-                </time>}
+                <time datetime={start.label_time} set:html={`&nbsp;${start.label_date} @ ${start.label_time}&nbsp;`}></time>
                 <h3 set:html={title}></h3>
             <!-- <div set:html={ excerpt }></div> -->
         </div>

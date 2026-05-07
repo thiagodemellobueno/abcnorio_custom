@@ -16,7 +16,7 @@ interface Props {
 }
 
 const {
-    dateFilter = 'upcoming',
+    dateFilter = 'ongoing-and-upcoming',
     eventType = '',
     collectiveAssociation = '',
     order = 'desc',
@@ -67,7 +67,7 @@ const [eventTypes, collectives] = await Promise.all([
                         label="Show only"
                         options={[
                             { value: '', label: 'All', checked: dateFilter === '' },
-                            { value: 'upcoming', label: 'Upcoming', checked: dateFilter === 'upcoming' },
+                            { value: 'ongoing-and-upcoming', label: 'Upcoming', checked: dateFilter === 'ongoing-and-upcoming' },
                             { value: 'past', label: 'Past', checked: dateFilter === 'past' },
                         ]}
                     />
@@ -194,6 +194,39 @@ const [eventTypes, collectives] = await Promise.all([
 
             document.body.addEventListener("htmx:beforeRequest", handleBeforeRequest);
             document.body.addEventListener("htmx:afterSwap", handleAfterSwap);
+
+            // On full-page load, sync form fields from URL params and reload listing.
+            // Needed for static builds where the server can't read URL params at render time.
+            const params = new URLSearchParams(window.location.search);
+            if (params.toString()) {
+                const form = document.getElementById("event-filters-form") as HTMLFormElement | null;
+                if (form) {
+                    for (const name of ["date-filter", "order"]) {
+                        const val = params.get(name);
+                        if (val !== null) { 
+                            const radio = form.querySelector<HTMLInputElement>(`input[name="${name}"][value="${val}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                radio.dispatchEvent(new Event("change", { bubbles: true }));
+                            }
+                        }
+                    }
+                    for (const name of ["event_type", "collective_association"]) {
+                        const val = params.get(name);
+                        const el = form.querySelector<HTMLSelectElement>(`select[name="${name}"]`);
+                        if (el && val !== null) el.value = val;
+                    }
+                    for (const name of ["event_start_before", "event_start_after"]) {
+                        const val = params.get(name);
+                        const el = form.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+                        if (el && val !== null) el.value = val;
+                    }
+                }
+                htmx.ajax("GET", `/events/listing${window.location.search}`, {
+                    target: "#events__listing",
+                    swap: "outerHTML swap:0.333s settle:0.333s",
+                });
+            }
 
             // When a date input gets a value, reset the date-filter segmented
             // control to "All" so it stays consistent with the actual query.

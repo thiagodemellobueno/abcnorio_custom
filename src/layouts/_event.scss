@@ -25,4 +25,29 @@
       margin-bottom: 0.5rem;
     }
   }
+
+    @media (min-width: breakpoints.get-breakpoint(md)) {
+      padding-top: 2rem;
+      > header {
+        background-color: #fffef3;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        time {
+          left: -0.5rem;
+          top: -0.5rem;
+        }
+        .venue-details {
+          padding-left: 2rem;
+        }
+        h1 {
+          padding-left: 2rem;
+        }
+      }
+
+      > article {
+        box-shadow: 1px 3px 4px rgba(0,0,0,0.3);
+        background-color: #fffef3;
+        overflow-y: hidden;
+      }
+    }
+
 }

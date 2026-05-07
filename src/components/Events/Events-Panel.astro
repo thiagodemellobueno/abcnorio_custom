@@ -13,7 +13,7 @@ const hrefBase = `/events${hrefParams.toString() ? `?${hrefParams.toString()}` :
 // ACF stores event dates as naive Y-m-d H:i:s in VENUE_TIMEZONE.
 // Use the same format and timezone for "now" so DATETIME comparisons are correct.
 const now = new Date().toLocaleString('sv', { timeZone: VENUE_TIMEZONE });
-const dateFilter = Astro.url.searchParams.get('date-filter') ?? 'upcoming';
+const dateFilter = Astro.url.searchParams.get('date-filter') ?? 'ongoing-and-upcoming';
 const filters: Record<string, string> = {};
 
 const explicitAfter = Astro.url.searchParams.get('event_start_after');

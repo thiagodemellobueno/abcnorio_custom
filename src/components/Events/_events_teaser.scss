@@ -12,7 +12,7 @@ $teaser_bg: #eee;
     .content {
         position: absolute;
         top: 2rem;
-        left: 0.8rem;
+        left: 5rem;
         max-width: 66.66666%;
         @media screen and (min-width: breakpoints.get-breakpoint(sm) ) and (max-width: breakpoints.get-breakpoint(lg)) {
             top: 3rem;
@@ -21,18 +21,23 @@ $teaser_bg: #eee;
     }
 
     time {
-        display: block;
+        display: inline;
+        position: relative;
         box-sizing: border-box;
-        padding: 0.25rem 2rem 0.25rem 0rem;
         max-width: fit-content;
-        color: var(--color-text);
-        background-color: $teaser_bg;
-        font-family: "Geist Mono", monospace;
         margin-bottom: 1rem;
-        display: block;
+        padding: 0.25rem 0rem 0.25rem 0rem;
+        transform: rotate3d( 0, 0, 1, -15deg);
+        color: var(--color-text);
+        background-color: #ffbaba;
+        font-family: "Geist Mono", monospace;
+        font-family: var(--font-impact-label);
+        font-size: 1.5rem;
+
     }
 
     h3 {
+        margin-top: 1rem;
         display: inline-block;
         font-family: "Geist Mono", monospace;
         font-size: 16px;
@@ -48,7 +53,7 @@ $teaser_bg: #eee;
         text-decoration: none;
         overflow: hidden;
         font-size: 1rem;
-        border: 1rem solid $teaser_bg;
+        border: 0.5rem solid $teaser_bg;
         transition-property: border, color, mix-blend-mode;
         transition-duration: 0.175s;
         transition-timing-function: ease-out;
@@ -67,21 +72,51 @@ $teaser_bg: #eee;
         &:focus,
         &:hover {
             border: 1rem solid $teaser_bg;
-            border-color: var(--color-text);
 
-            time,
+            time {
+                color: var(--color-text);
+                background-color: #ffbaba;
+            }
+
             h3 {
                 background-color: var(--color-text);
                 color: $teaser_bg;
             }
 
             img {
-                opacity: 0.85;
-                mix-blend-mode: multiply;//luminosity;
+                opacity: 0.95;
+                mix-blend-mode:hard-light;//luminosity;
             }
         }
     }
+
+    &.past {
+        background-color: #dedede;
+    }
+
     @media (min-width: breakpoints.get-breakpoint(md)) {
         aspect-ratio: 3 / 4;
+        .content {
+            left: 2rem;
+        }
+
+        a {
+            border-width: 1rem;
+            aside & {
+                border-width: 0rem;
+                .content {
+                    left: 0;
+                }
+            } 
+        }
+
+        time {
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            padding-left: 0.5rem;
+        }
+
     }
 }

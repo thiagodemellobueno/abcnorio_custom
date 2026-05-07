@@ -19,7 +19,7 @@ import Pagination from '@components/Pagination/Pagination.astro';
 import { POSTS_PER_PAGE, VENUE_TIMEZONE } from '@consts';
 
 const url = new URL(Astro.request.url);
-const dateFilter = url.searchParams.get('date-filter') ?? 'upcoming';
+const dateFilter = url.searchParams.get('date-filter') ?? 'ongoing-and-upcoming';
 const page = parseInt(url.searchParams.get('page') ?? '1', 10);
 
 // ACF stores event dates as naive Y-m-d H:i:s in VENUE_TIMEZONE.
@@ -28,11 +28,16 @@ const now = new Date().toLocaleString('sv', { timeZone: VENUE_TIMEZONE });
 const filters: Record<string, string> = {};
 
 const explicitAfter = url.searchParams.get('event_start_after');
-const effectiveDateFilter = (dateFilter === 'upcoming' && explicitAfter && explicitAfter < now)
+const effectiveDateFilter = (dateFilter === 'ongoing-and-upcoming' && explicitAfter && explicitAfter < now)
     ? 'all'
     : dateFilter;
 
-if (effectiveDateFilter === 'upcoming') {
+if (effectiveDateFilter === 'ongoing-and-upcoming') {
+    // Include events that are still ongoing (end_date >= today) or starting today or later.
+    // Uses the computed event_effective_end field: events with no end date get midnight of their start date.
+    const start_of_today = new Date().toLocaleString('sv', { timeZone: VENUE_TIMEZONE }).slice(0, 10) + ' 00:00:00';
+    filters['event_effective_end_after'] = start_of_today;
+} else if (effectiveDateFilter === 'upcoming') {
     filters['event_start_after'] = now;
 } else if (effectiveDateFilter === 'past') {
     filters['event_start_before'] = now;

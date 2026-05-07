@@ -5,8 +5,8 @@ import Layout from '@layouts/page.astro';
 import Block from '@components/wp-blocks/generic-block.astro';
 import { SITE_URL, REST_PATH } from '@util/paths.js';
 import { buildPostSeo } from '@util/seo.js';
-import { getCollection } from 'astro:content';
 import { fetchWpPost } from '@util/fetch-data.js';
+import { collectionPaths } from '@util/static-paths.js';
 
 const { slug } = Astro.params;
 const post: any = await fetchWpPost(
@@ -22,16 +22,7 @@ const seo = buildPostSeo({
 });
 
 export async function getStaticPaths() {
-  const scope = process.env.SCOPE || 'full';
-  if (scope !== 'full' && scope !== 'about') {
-    return [];
-  }
-
-  const entries = await getCollection('about_pages');
-  return entries.map((entry: any) => ({
-    params: { slug: entry.id },
-    props: { post: entry.data },
-  }));
+  return collectionPaths('about_pages', process.env.SCOPE, 'about');
 }
 
 

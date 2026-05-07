@@ -1,0 +1,79 @@
+---
+export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'collectives'].includes(process.env.SCOPE || 'full');
+
+import Layout from '@layouts/sidebar.astro';
+import Block from '@components/wp-blocks/generic-block.astro';
+import CollectiveEventsPanel from '@components/Events/Collective-Events-Panel.astro';
+import { SITE_URL, REST_PATH } from '@util/paths.js';
+import { buildPostSeo } from '@util/seo.js';
+import { getEntry } from 'astro:content';
+import { fetchWpPost } from '@util/fetch-data.js';
+import { fetchAllWpItems, fetchWpJson } from '@util/wp-fetch.js';
+import { collectiveIndexPaths } from '@util/static-paths.js';
+
+const { slug } = Astro.params;
+const post: any = await fetchWpPost(
+  `${REST_PATH}collectives?slug=${encodeURIComponent(slug ?? '')}`,
+  (Astro.props as any)?.post,
+);
+
+const blocks: any[] = post?.blocks ?? [];
+const seo = buildPostSeo({
+  post,
+  siteUrl: SITE_URL,
+  pathname: `/collectives/${slug}/`
+});
+const collectiveTermId = post?.['collective-associations']?.[0];
+
+let subpages: any[] = (Astro.props as any).subpages ?? [];
+if (!subpages.length && slug) {
+  // SSR path: look up parent_collective term by collective slug, then fetch pages
+  try {
+    const terms = await fetchWpJson(`${REST_PATH}parent-collectives?slug=${encodeURIComponent(slug)}`);
+    const termId = terms?.[0]?.id;
+    if (termId) {
+      const raw = await fetchAllWpItems(`${REST_PATH}pages?parent-collectives=${termId}&_fields=id,slug,title,link`);
+      subpages = raw.map((p: any) => ({ data: p }));
+    }
+  } catch (_) {}
+}
+
+export async function getStaticPaths() {
+  return collectiveIndexPaths(process.env.SCOPE);
+}
+
+---
+
+<Layout
+  title={seo.title}
+  description={seo.description}
+  canonical={seo.canonical}
+  ogImage={seo.ogImage}>
+
+  <header slot="header">
+    <h1 set:html={post.title.rendered}></h1>
+
+    <ul slot="main">
+      {subpages.map((subpage: any) => (
+        <li><a href={subpage.data.link}>{subpage.data.title.rendered}</a></li>
+      ))}
+    </ul>
+
+  </header>
+
+  <article slot="main">
+    { blocks.map((block: any) => (
+      <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks || null} />
+    ))}
+  </article>
+
+  <aside slot="sidebar">
+      {collectiveTermId && (
+        <h2>Upcoming Events</h2>
+        <CollectiveEventsPanel collectiveTermId={collectiveTermId} limit={3} />
+      )}
+  </aside>
+</Layout>
+
+
+

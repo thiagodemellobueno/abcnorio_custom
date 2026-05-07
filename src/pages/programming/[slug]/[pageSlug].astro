@@ -1,0 +1,59 @@
+---
+export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'programming'].includes(process.env.SCOPE || 'full');
+
+import Layout from '@layouts/sidebar.astro';
+import Block from '@components/wp-blocks/generic-block.astro';
+import Breadcrumbs from '@components/Breadcrumbs/Breadcrumbs.astro';
+import { SITE_URL, REST_PATH } from '@util/paths.js';
+import { buildPostSeo } from '@util/seo.js';
+import { fetchWpPost } from '@util/fetch-data.js';
+import { withChildPagesLeafPaths } from '@util/static-paths.js';
+
+// DATA FLOW
+// Static build (prerender=true, production/preview SCOPE):
+//   getStaticPaths runs at build time — fetches programming_pages collection
+//   (cached WP data from content.config.ts wpChildPagesLoader), then fetches
+//   each entry's WP children via REST to produce { slug, pageSlug } param pairs.
+//   `post` prop is passed directly from getStaticPaths — no runtime fetch.
+//   fetchWpPost receives the prop and returns it as-is (no network call).
+//
+// SSR (prerender=false, development/staging MODE):
+//   getStaticPaths does not run. Astro.props.post is undefined.
+//   fetchWpPost falls back to fetching live from WP REST by pageSlug.
+//   `slug` (parent segment) is available in Astro.params for path construction
+//   but is not used to fetch — pageSlug alone identifies the page.
+
+const { slug, pageSlug } = Astro.params;
+const post: any = await fetchWpPost(
+  `${REST_PATH}pages?slug=${encodeURIComponent(pageSlug ?? '')}`,
+  (Astro.props as any)?.post,
+);
+
+const blocks: any[] = post?.blocks ?? [];
+const seo = buildPostSeo({
+  post,
+  siteUrl: SITE_URL,
+  pathname: `/programming/${slug}/${pageSlug}/`
+});
+
+export async function getStaticPaths() {
+  return withChildPagesLeafPaths('programming_pages', process.env.SCOPE, 'programming');
+}
+---
+<Layout
+  title={seo.title}
+  description={seo.description}
+  canonical={seo.canonical}
+  ogImage={seo.ogImage}>
+
+  <header slot="header">
+    <Breadcrumbs path={Astro.url.pathname} />
+    <h1 set:html={post.title.rendered}></h1>
+  </header>
+  <article slot="main">    
+    {blocks.map((block: any) => <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks} />)}  
+  </article>
+  <aside slot="sidebar">
+  </aside>
+
+</Layout>

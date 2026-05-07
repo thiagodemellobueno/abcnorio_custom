@@ -17,6 +17,10 @@
   padding: 2rem;
   gap: 2rem;
 
+  .wrapper {
+    margin-top: 2rem;
+  }
+
   > header {
     order: 1;
   }
@@ -35,14 +39,15 @@
   }
 
   @media (min-width: breakpoints.get-breakpoint(md)) {
-    gap: 3rem;
+    column-gap: 3rem;
+    row-gap: 0;
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     padding: 0 3rem;
 
     > header {
       order: 1;
-      grid-column: 1 / 5;
+      grid-column: 1 / 6;
     }
 
 
@@ -57,6 +62,7 @@
     }
 
     > article {
+      padding: 2rem;
       order: 3;
       grid-column: 1 / 6;
     }

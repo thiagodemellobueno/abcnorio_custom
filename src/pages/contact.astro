@@ -1,0 +1,238 @@
+---
+export const prerender = false;
+import { actions, isInputError } from 'astro:actions';
+import Layout from '@layouts/page.astro';
+
+const result = Astro.getActionResult(actions.submitContactForm);
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
+---
+<Layout title="Contact — ABC No Rio">
+    <section class="form-page">
+        <h1>Contact</h1>
+
+        <div id="form-result" class="hidden">
+            {result?.data?.success && (
+                <p role="status">Thanks for reaching out! We'll be in touch.</p>
+            )}
+
+            {result?.error && !isInputError(result.error) && (
+                <p role="alert">Something went wrong. Please try again.</p>
+            )}
+        </div>
+
+        <form method="POST" action={actions.submitContactForm} novalidate>
+            <fieldset class="field">
+                <label for="name">Name</label>
+                <input
+                    id="name"
+                    type="text"
+                    name="name"
+                    required
+                    aria-describedby={inputErrors.name ? 'name-error' : undefined}
+                    aria-invalid={inputErrors.name ? 'true' : undefined}
+                />
+                <!-- {inputErrors.name && (
+                    <p id="name-error" role="alert">{inputErrors.name.join(', ')}</p>
+                )} -->
+            </fieldset>
+
+            <fieldset class="field">
+                <label for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    required
+                    aria-describedby={inputErrors.email ? 'email-error' : undefined}
+                    aria-invalid={inputErrors.email ? 'true' : undefined}
+                />
+                <!-- {inputErrors.email && (
+                    <p id="email-error" role="alert">{inputErrors.email.join(', ')}</p>
+                )} -->
+            </fieldset>
+
+            <fieldset class="field">
+                <label for="subject">Subject</label>
+                <input
+                    id="subject"
+                    type="text"
+                    name="subject"
+                    required
+                    aria-describedby={inputErrors.subject ? 'subject-error' : undefined}
+                    aria-invalid={inputErrors.subject ? 'true' : undefined}
+                />
+                <!-- {inputErrors.subject && (
+                    <p id="subject-error" role="alert">{inputErrors.subject.join(', ')}</p>
+                )} -->
+            </fieldset>
+
+            <fieldset class="field">
+                <div class="tooltip hidden">
+                    <div class="tooltip__message">
+                        Error
+                    </div>
+                </div>
+                <label for="message">Message</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    required
+                    minlength="30"
+                    rows="6"
+                    aria-describedby={inputErrors.message ? 'message-error' : undefined}
+                    aria-invalid={inputErrors.message ? 'true' : undefined}
+                ></textarea>
+                <!-- {inputErrors.message && (
+                    <p id="message-error" role="alert">{inputErrors.message.join(', ')}</p>
+                )} -->
+            </fieldset>
+
+            <button type="submit">Send</button>
+        </form>
+    </section>
+</Layout>
+
+<script>
+import { actions, isInputError } from 'astro:actions';
+
+const form = document.querySelector('.form-page form') as HTMLFormElement | null;
+const result = document.getElementById('form-result');
+form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!result || !form) return;
+    const { data, error } = await actions.submitContactForm(new FormData(form));
+    // console.log({ data, error });
+    if (data?.success) {
+        result.classList.remove('hidden', 'error');
+        result.classList.add('success', 'fadein');
+        result.innerHTML = '<p role="status">Thanks for reaching out! We\'ll be in touch.</p>';
+        form.reset();
+    } else if (isInputError(error)) {
+        result.classList.remove('hidden', 'success');
+        result.classList.add('error', 'fadein');
+        Object.entries(error.fields).forEach( ([fieldName, fieldErrors], i) => {
+            let field = form.querySelector(`[name="${fieldName}"]`);
+            let tt = field.parentNode.querySelector('.tooltip');
+            if (tt) {
+                console.log( tt, tt.classList);
+                let msg = tt.querySelector('.tooltip__message');
+                msg.textContent = (fieldErrors as string[]).join(', ');
+                tt.classList.remove('hidden');
+                tt.classList.add('fadein');
+                setTimeout(() => {
+                    tt.classList.add('hidden');
+                    tt.classList.remove('fadein');
+                }, 3000);
+            }
+        });
+    } else {
+        result.classList.remove('hidden', 'success');
+        result.classList.add('error', 'fadein');
+        result.innerHTML = '<p role="alert">Something went wrong. Please try again.</p>';
+    }
+
+    setTimeout(() => {
+        result.classList.add('hidden');
+        result.classList.remove('success', 'error', 'fadein');
+    }, 5000);
+});
+</script>
+<style>
+    .field {
+        margin-bottom: 1.5em;
+        position: relative;
+        .tooltip {
+            /* top: 0; */
+            left: 5rem;
+            top: 0rem;
+            position: absolute;
+            transition: top 0.3s ease-out, opacity 0.5s ease-out;
+            .tooltip__message {
+                padding: 0.5em;
+                position: relative;
+                background-color: var(--color-text);
+                color: #fff;
+                padding: 0.25em 0.5em;
+                border-radius: 4px;
+                font-size: 1rem;
+                line-height: 1.2;
+                &::after {
+                    content: '';
+                    position: relative;
+                    bottom: -2rem;
+                    left: 0;
+                    z-index: 10;
+                    transform: translateY(-50%);
+                    border-width: 0.5rem;
+                    border-style: solid;
+                    border-color: var(--color-text) transparent transparent transparent;
+                }
+            }
+            &.hidden {
+                opacity: 0;
+                display: block;
+            }
+            &.fadein {
+                opacity: 1;
+                display: block;
+                top: -1rem;
+            }
+        }
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5em;
+        font-weight: bold;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    input[aria-invalid="true"], textarea[aria-invalid="true"] {
+        border-color: red;
+    }
+
+    .form-page button[type="submit"] {
+        background-color: var(--color-nav-link);
+        color: #fff;
+        padding: 0.75em 1.5em;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .form-page button[type="submit"]:hover {
+        background-color: var(--color-nav-link);
+    }
+
+    #form-result p {
+        margin-top: 1em;
+        font-weight: bold;
+    }
+
+    #form-result p[role="alert"] {
+        color: red;
+    }
+
+    #form-result {
+        transition: opacity 0.5s ease-in-out;
+        opacity: 0;
+
+        &.fadein {
+            opacity: 1;
+        }
+        &.hidden {
+            opacity: 0;
+        }
+    }
+
+
+</style>

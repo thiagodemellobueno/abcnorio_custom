@@ -42,12 +42,15 @@ Incremental, block-aware. Fetches all items, uses modified_gmt as a change signa
 
 ### wpSimpleLoader
 Full reload on every build, no blocks. Used for listing/taxonomy data.
-wpChildPagesLoader — variant of wpLoader that resolves a parent page slug first, then incrementally loads its child pages with blocks.
-- news_items, event_types, 
+- news_items, event_types
 
 ### wpChildPagesLoader
 Variant of wpLoader that resolves a parent page slug first, then incrementally loads its child pages with blocks.
-- about_pages, programming pages
+- about_pages, programming_pages
+
+### wpCollectiveSubpagesLoader
+Fetches all `parent_collective` taxonomy terms to get their IDs, then incrementally loads all pages tagged with any of those terms (with blocks). Used to surface pages editorially associated with a collective.
+- collective_subpages
 
 If a fetch fails at build time, loaders warn and retain the existing store rather than failing the build.
 

@@ -1,0 +1,60 @@
+---
+export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'programming'].includes(process.env.SCOPE || 'full');
+
+import Layout from '@layouts/sidebar.astro';
+import Block from '@components/wp-blocks/generic-block.astro';
+import { SITE_URL, REST_PATH } from '@util/paths.js';
+import { buildPostSeo } from '@util/seo.js';
+import { fetchWpPost } from '@util/fetch-data.js';
+import { fetchAllWpItems } from '@util/wp-fetch.js';
+import { withChildPagesIndexPaths } from '@util/static-paths.js';
+
+const { slug } = Astro.params;
+const post: any = await fetchWpPost(
+  `${REST_PATH}pages?slug=${encodeURIComponent(slug ?? '')}`,
+  (Astro.props as any)?.post,
+);
+
+const blocks: any[] = post?.blocks ?? [];
+
+// Static build: subpages passed as props from getStaticPaths (no extra fetch).
+// SSR: props.subpages is undefined, so fetch live from WP using the post ID.
+let subpages: any[] = (Astro.props as any).subpages ?? [];
+if (!subpages.length && post?.id) {
+  try {
+    subpages = await fetchAllWpItems(`${REST_PATH}pages?parent=${post.id}&_fields=id,slug,title,link`);
+  } catch (_) {}
+}
+const seo = buildPostSeo({
+  post,
+  siteUrl: SITE_URL,
+  pathname: `/programming/${slug}/`
+});
+
+export async function getStaticPaths() {
+  return withChildPagesIndexPaths('programming_pages', process.env.SCOPE, 'programming');
+}
+
+---
+<Layout
+  title={seo.title}
+  description={seo.description}
+  canonical={seo.canonical}
+  ogImage={seo.ogImage}>
+
+  <header slot="header">
+    <h1 set:html={post.title.rendered}></h1>
+  </header>
+  <article slot="main">
+    {blocks.map((block: any) => <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks} />)}  
+  </article>
+  <aside slot="sidebar">
+    {subpages.length > 0 && (
+      <ul>
+        {subpages.map((subpage: any) => (
+          <li><a href={`/programming/${slug}/${subpage.slug}/`} set:html={subpage.title.rendered} /></li>
+        ))}
+      </ul>
+    )}
+  </aside>
+</Layout>

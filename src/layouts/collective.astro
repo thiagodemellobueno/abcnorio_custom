@@ -1,6 +1,7 @@
 ---
 import Head from '@components/Head.astro';
 import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import { Debug } from 'astro:components';
 const {
   title,
@@ -31,6 +32,7 @@ const slug = Astro.url.pathname.split('/').filter(Boolean).pop() || 'home';
         <slot name="main"/>
         <slot name="sidebar" />
     </main>
+    <Footer />
   </body>
   <script data-goatcounter="https://abcnorio.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </html>

@@ -6,10 +6,11 @@ import Block from '@components/wp-blocks/generic-block.astro';
 import CollectiveEventsPanel from '@components/Events/Collective-Events-Panel.astro';
 import { SITE_URL, REST_PATH } from '@util/paths.js';
 import { buildPostSeo } from '@util/seo.js';
-import { getEntry } from 'astro:content';
 import { fetchWpPost } from '@util/fetch-data.js';
 import { fetchAllWpItems, fetchWpJson } from '@util/wp-fetch.js';
 import { collectiveIndexPaths } from '@util/static-paths.js';
+
+import '../_collective.scss';
 
 const { slug } = Astro.params;
 const post: any = await fetchWpPost(
@@ -51,28 +52,27 @@ export async function getStaticPaths() {
   ogImage={seo.ogImage}>
 
   <header slot="header">
-    <h1 set:html={post.title.rendered}></h1>
-
-    <ul slot="main">
-      {subpages.map((subpage: any) => (
-        <li><a href={subpage.data.link}>{subpage.data.title.rendered}</a></li>
-      ))}
-    </ul>
-
+    <h1 set:html={post.title.rendered} />
   </header>
 
+  <aside slot="sidebar">
+    <ul>
+    {subpages.map((subpage: any) => (
+      <li><a href={subpage.data.link}>{subpage.data.title.rendered}</a></li>
+    ))}
+    </ul>
+  </aside>
+
   <article slot="main">
-    { blocks.map((block: any) => (
+    {collectiveTermId && (
+      <h2>Upcoming Events</h2>
+      <CollectiveEventsPanel collectiveTermId={collectiveTermId} limit={3} />
+    )}
+    {blocks.map((block: any) => (
       <Block component={block.name} attributes={block.attributes} innerBlocks={block.innerBlocks || null} />
     ))}
   </article>
 
-  <aside slot="sidebar">
-      {collectiveTermId && (
-        <h2>Upcoming Events</h2>
-        <CollectiveEventsPanel collectiveTermId={collectiveTermId} limit={3} />
-      )}
-  </aside>
 </Layout>
 
 

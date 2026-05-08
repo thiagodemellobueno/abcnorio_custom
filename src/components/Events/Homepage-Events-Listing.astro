@@ -1,5 +1,6 @@
 ---
 import "./_homepage-listing.scss";
+import { hasValue } from '@util/dates.js';
 
 interface Props {
   items: any[];
@@ -7,9 +8,7 @@ interface Props {
   requiredProps?: string[];
 }
 
-const { items, teaserComponent, requiredProps = [] }: Props = Astro.props;
-
-const hasValue = (value: any) => value !== undefined && value !== null && value !== '';
+const { items, teaserComponent, requiredProps = [] }: Props = Astro.props;;
 
 const readRequiredProp = (item: any, prop: string) => {
 
@@ -21,7 +20,7 @@ const readRequiredProp = (item: any, prop: string) => {
     return item?.excerpt?.rendered;
   }
 
-  return item?.[prop] ?? item?.meta?.[prop] ?? item?.acf?.[prop];
+  return item?.acf?.[prop];
 };
 
 let listing = Array.isArray(items)

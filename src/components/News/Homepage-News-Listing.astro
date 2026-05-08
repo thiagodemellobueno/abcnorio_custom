@@ -1,16 +1,15 @@
 ---
 import NewsTeaser from "@components/News/News-Teaser.astro";
 import "./_homepage-news-listing.scss";
+import { hasValue } from '@util/dates.js';
 
 interface Props {
   items: any[];
 }
 
 const { items }: Props = Astro.props;
-
-const hasValue = (value: any) => value !== undefined && value !== null && value !== '';
 let listing = Array.isArray(items)
-    ? items.filter((item: any) => hasValue(item?.meta?.news_item_date ?? item?.acf?.news_item_date))
+    ? items.filter((item: any) => hasValue(item?.acf?.news_item_date))
     : [];
 
 listing = listing.slice(0, 7);

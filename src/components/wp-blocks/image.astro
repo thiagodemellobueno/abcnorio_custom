@@ -1,6 +1,6 @@
 ---
 import { CMS_URL } from "@util/paths.js";
-const { attributes } = Astro.props;
+const { attributes, loading = 'lazy', decoding = 'async' } = Astro.props;
 const alt = attributes?.alt ?? "";
 const sizeSlug = attributes?.sizeSlug ?? "";
 const rawSrcset = attributes?.srcset ?? "";
@@ -120,8 +120,8 @@ const caption = attributes?.caption || '';
       alt={altText}
       width={width}
       height={height}
-      loading="eager"
-      decoding="async"
+      loading={loading}
+      decoding={decoding}
     />
     <figcaption set:html={caption} />
   </figure>
@@ -134,17 +134,17 @@ const caption = attributes?.caption || '';
     alt={altText}
     width={width}
     height={height}
-    loading="eager"
-    decoding="async"
+    loading={loading}
+    decoding={decoding}
   />
 )}
 <style>
   figure {
     margin: 1.5rem 0;
     display: inline-block;
-    max-width: 100%;
     padding: 1px;
     background-color: var(--color-panel-bg);
+    max-width: 100%;
   }
   figcaption {
     padding: 0.25rem 0.25rem;

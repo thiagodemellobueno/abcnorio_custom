@@ -20,7 +20,7 @@ interface Props {
 }
 
 const { data, showTeaser = true }: Props = Astro.props;
-const dateRaw = data?.meta?.news_item_date ?? data?.acf?.news_item_date ?? '';
+const dateRaw = data?.acf?.news_item_date ?? '';
 const date = formatNewsDate(dateRaw);
 const slug = data?.slug || '';
 const title = data?.title?.rendered || slug || 'Untitled';

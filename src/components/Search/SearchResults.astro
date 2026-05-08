@@ -10,21 +10,9 @@ interface Props {
     query?: string;
 }
 
+import { formatEventDate } from '@util/dates.js';
+
 const { results = {}, query = '' } = Astro.props;
-
-const months   = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-function formatEventDate(raw: string) {
-    const d = new Date(raw);
-    if (isNaN(d.getTime())) return null;
-    const hour = d.getHours() % 12 || 12;
-    const mins = String(d.getMinutes()).padStart(2, '0');
-    return {
-        datetime: raw.replace(' ', 'T'),
-        label: `${weekdays[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} @ ${hour}:${mins}`,
-    };
-}
 
 const allResults = Object.values(results).flat();
 const hasResults = allResults.length > 0;
@@ -41,7 +29,7 @@ const showNoResults = query.length >= 2 && !hasResults;
                         return (
                             <article class="search__result">
                                 <a href={r.url}>
-                                    {start && <time datetime={start.datetime}>{start.label}</time>}
+                                    {start && <time datetime={start.datetime}>{start.label_date} @ {start.label_time} {start.ampm}</time>}
                                     <p>{r.title}</p>
                                 </a>
                             </article>

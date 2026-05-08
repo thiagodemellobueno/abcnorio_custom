@@ -7,10 +7,18 @@ import Layout from '@layouts/landing.astro';
 import Block from '@components/wp-blocks/generic-block.astro';
 
 const { slug } = Astro.params;
+
+// for dev/staging, allow passing in post data via props to avoid repeated fetches
 const post: any = await fetchWpPost(
   `${REST_PATH}pages?slug=${encodeURIComponent(slug ?? '')}`,
   (Astro.props as any)?.post,
 );
+// for preview/production go to data store to get all pages and find the one matching the slug
+export async function getStaticPaths() {
+  const reservedSlugs = ['about', 'collectives', 'events', 'programming'];
+  return collectionPaths('pages', process.env.SCOPE, 'full',
+    (entry: any) => !reservedSlugs.includes(entry.id));
+}
 
 const blocks: any[] = post?.blocks ?? [];
 
@@ -20,11 +28,6 @@ const seo = buildPostSeo({
   pathname: `/${slug}/`
 });
 
-export async function getStaticPaths() {
-  const reservedSlugs = ['about', 'collectives', 'events', 'programming'];
-  return collectionPaths('pages', process.env.SCOPE, 'full',
-    (entry: any) => !reservedSlugs.includes(entry.id));
-}
 ---
 <Layout
   title={seo.title}

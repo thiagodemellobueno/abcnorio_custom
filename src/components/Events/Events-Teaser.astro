@@ -1,21 +1,6 @@
 ---
 import "./_events_teaser.scss";
-const months  = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-
-function formatEventDate(raw: string): { datetime: string; label_date: string; label_time: string } | null {
-    if (!raw) return null;
-    const d = new Date(raw);
-    if (Number.isNaN(d.getTime())) return null;
-    const hour = d.getHours() % 12 || 12;
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    return {
-        datetime: raw.replace(' ', 'T'),
-        label_date: `${weekdays[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
-        label_time: `${hour}:${minutes}`,
-    };
-}
+import { formatEventDate } from '@util/dates.js';
 
 interface Props {
     data: any;
@@ -23,9 +8,9 @@ interface Props {
 }
 
 const { data, showTeaser = true }: Props = Astro.props;
-const startRaw = data?.meta?.event_start_date ?? data?.acf?.event_start_date ?? '';
+const startRaw = data?.acf?.event_start_date ?? '';
 const start = formatEventDate(startRaw);
-const endRaw = data?.meta?.event_end_date ?? data?.acf?.event_end_date ?? '';
+const endRaw = data?.acf?.event_end_date ?? '';
 const end = formatEventDate(endRaw);
 const slug  = data?.slug || '';
 const title = data?.title?.rendered || slug || 'Untitled event';
@@ -50,9 +35,10 @@ if( end?.datetime ) {
 
         <div class="content">
             {start && 
-                <time datetime={start.label_time} set:html={`&nbsp;${start.label_date} @ ${start.label_time}&nbsp;`}></time>
+                <time datetime={start.label_time} set:html={`&nbsp;${start.label_date}<br/>&nbsp;@ ${start.label_time}&nbsp;`}></time>
                 <h3 set:html={title}></h3>
-            <!-- <div set:html={ excerpt }></div> -->
+            // <!-- <div set:html={ excerpt }></div> -->
+            }
         </div>
     </a>
 </article>

@@ -1,0 +1,52 @@
+---
+export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'events'].includes(process.env.SCOPE || 'full');
+
+import Layout from "@layouts/events.astro";
+import EventListing from "@components/Events/Events-Listing.astro";
+import StaticPagination from "@components/Pagination/StaticPagination.astro";
+import { getEvents } from "@lib/events/events.js";
+import { getCollection } from "astro:content";
+import { POSTS_PER_PAGE } from "@consts";
+
+export async function getStaticPaths() {
+  const types = await getCollection('event_types' as any);
+  const paths: any[] = [];
+
+  await Promise.all(
+    types
+      .filter((entry: any) => entry.id && entry.data?.id)
+      .map(async (entry: any) => {
+        const { totalPages } = await getEvents(
+          { event_type: entry.data.id, orderby: 'event_start_date', order: 'desc' },
+          { page: 1, perPage: POSTS_PER_PAGE },
+        );
+        for (let p = 2; p <= totalPages; p++) {
+          const { events, total } = await getEvents(
+            { event_type: entry.data.id, orderby: 'event_start_date', order: 'desc' },
+            { page: p, perPage: POSTS_PER_PAGE },
+          );
+          paths.push({
+            params: { term: entry.id, page: String(p) },
+            props: { eventType: entry.data, events, total, totalPages, currentPage: p },
+          });
+        }
+      }),
+  );
+
+  return paths;
+}
+
+const { term } = Astro.params;
+const { eventType, events, total, totalPages, currentPage } = Astro.props as any;
+---
+
+<Layout title={`Events: ${eventType?.name ?? term} — page ${currentPage}`}>
+  <h1>{eventType?.name ?? term}</h1>
+  <EventListing events={events} total={total} />
+  <StaticPagination
+    currentPage={currentPage}
+    totalPages={totalPages}
+    pageOneHref={`/events/event-type/${term}`}
+    pageHref={(p: number) => `/events/event-type/${term}/${p}`}
+  />
+</Layout>

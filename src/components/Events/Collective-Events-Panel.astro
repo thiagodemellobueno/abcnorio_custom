@@ -17,20 +17,20 @@ const upcoming = allEntries
     .filter((entry: any) => {
         const assoc: number[] = entry.data?.['collective-associations'] ?? [];
         if (!assoc.includes(collectiveTermId)) return false;
-        const startRaw = entry.data?.meta?.event_start_date ?? entry.data?.acf?.event_start_date ?? '';
+        const startRaw = entry.data?.acf?.event_start_date ?? '';
         return startRaw && new Date(startRaw) >= now;
     })
     .sort((a: any, b: any) => {
-        const aMs = new Date(a.data?.meta?.event_start_date ?? '').getTime();
-        const bMs = new Date(b.data?.meta?.event_start_date ?? '').getTime();
+        const aMs = new Date(a.data?.acf?.event_start_date ?? '').getTime();
+        const bMs = new Date(b.data?.acf?.event_start_date ?? '').getTime();
         return order === 'asc' ? aMs - bMs : bMs - aMs;
     })
     .slice(0, limit);
 ---
 {upcoming.length > 0 && (
-    <events-panel>
+    <section class="events-panel teaser">
         {upcoming.map((entry: any) => (
             <EventTeaser data={entry.data} />
         ))}
-    </events-panel>
+    </section>
 )}

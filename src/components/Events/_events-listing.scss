@@ -1,10 +1,10 @@
 @use "@tokens/breakpoints";
 @use "@mixins/layout";
 
-$teaser-out-duration: 0.333s;
-$teaser-in-duration: 0.333s;
-$stagger-count: 24;
-$stagger-step: 25ms;
+$teaser-out-duration: 0.2s;
+$teaser-in-duration: 0.2s;
+$stagger-count: 22;
+$stagger-step: 23ms;
 
 .listing {
   display: grid;

@@ -1,0 +1,100 @@
+@use "@tokens/colors";
+@use "@tokens/breakpoints";
+@use "@mixins/layout";
+
+.sidebar-layout {
+
+  @include layout.sidebar();
+
+  > header {
+    position: relative;
+    
+    time {
+      padding: 0 1rem;
+      position: relative;
+      color: #444;
+      display: inline-block;
+      font-family: var(--font-impact-label), monospace;
+      font-size: 1.5rem;
+      transform: translate(-1.5rem, -2.5rem) rotate3d(0, 0, 1, -3deg);
+    }
+
+    h1 {
+      @media screen and (min-width: breakpoints.get-breakpoint(sm)) {
+        max-width: 70%;
+        padding-right: 0rem;
+      }
+
+      @media screen and (min-width: breakpoints.get-breakpoint(md)) {
+        max-width: 65%;
+      }
+    }
+  }
+
+  > aside {
+    button {
+      display: inline;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-types-taxonomy {
+      margin-bottom: 1rem;
+      background-color: var(--color-panel);
+      border: 1px solid #fc0;
+      // margin-top: 2rem;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      a {
+        background-color: var(--color-text);
+        display: inline-block;
+        line-height: 1;
+        color: #dedede;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        text-decoration: none;
+      }
+    }
+  }
+
+  @media (min-width: breakpoints.get-breakpoint(sm)) {
+    .event__poster img {
+      position: absolute;
+      top: -2rem;
+      right: 2rem;
+      z-index: 10;
+      height: auto;
+      aspect-ratio: 5/7;
+      object-fit: contain;
+      max-width: 300px;
+    }
+  }
+
+  @media (min-width: breakpoints.get-breakpoint(md)) {
+    padding-top: 2rem;
+
+    .event__poster {
+      img {
+        display: block;
+        max-width: 300px;
+      }
+    }
+
+    > header {
+      position: relative;
+      time {
+        transform: translate(-3.5rem, -2.5rem) rotate3d(0, 0, 1, -3deg);
+      }
+      .venue-details {
+      }
+    }
+
+    > article {
+      position: relative;
+
+    }
+  }
+}

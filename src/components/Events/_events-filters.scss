@@ -5,21 +5,35 @@
     background-color: #efefef;
 }
 
-.filters {
+.filter__wrapper {
+    @include layout.max-width();
     position: fixed;
+    left: -120vw;
+    z-index: 1050;
     top: 0;
     width: 100%;
+    transition-property: left;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
     background-color: #eee;
-    z-index: 150;
     height: 100vh;
-    @include layout.max-width();
     align-items: flex-start;
+    padding-top: 6rem;
 
-    >div {
+    > form > div {
         left: -100vw;
         display: flex;
         flex-direction: column;
         padding: 1rem;
+    }
+
+    .filter__close {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        @media screen and (min-width: breakpoints.get-breakpoint(sm)) {
+            display: none;
+        }
     }
 
     h2 {
@@ -63,7 +77,7 @@
     }
 
     @media screen and (min-width: breakpoints.get-breakpoint(sm)) {
-        >div {
+        > form > div {
             display: flex;
             align-items: flex-start;
             gap: 1rem;
@@ -74,8 +88,9 @@
     @media screen and (min-width: breakpoints.get-breakpoint(md)) {
         position: static;
         height: auto;
+        left: 0;
 
-        >div {
+        > form > div {
             gap: 2rem;
             display: block;
         }
@@ -89,5 +104,10 @@
         background: none;
         border: none;
         cursor: pointer;
+    }
+
+
+    &.active {
+        left: 0;
     }
 }

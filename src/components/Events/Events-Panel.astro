@@ -17,12 +17,13 @@ const dateFilter = Astro.url.searchParams.get('date-filter') ?? 'ongoing-and-upc
 const filters: Record<string, string> = {};
 
 const explicitAfter = Astro.url.searchParams.get('event_start_after');
-const effectiveDateFilter = (dateFilter === 'upcoming' && explicitAfter && explicitAfter < now)
+const effectiveDateFilter = (dateFilter === 'ongoing-and-upcoming' && explicitAfter && explicitAfter < now)
     ? 'all'
     : dateFilter;
 
-if (effectiveDateFilter === 'upcoming') {
-    filters['event_start_after'] = now;
+if (effectiveDateFilter === 'ongoing-and-upcoming') {
+    const start_of_today = new Date().toLocaleString('sv', { timeZone: VENUE_TIMEZONE }).slice(0, 10) + ' 00:00:00';
+    filters['event_effective_end_after'] = start_of_today;
 } else if (effectiveDateFilter === 'past') {
     filters['event_start_before'] = now;
 }
@@ -37,7 +38,7 @@ filters['order'] = Astro.url.searchParams.get('order') ?? 'desc';
 
 const { events, total, totalPages } = await getEvents(filters, { page, perPage: POSTS_PER_PAGE });
 ---
-<events-panel>
+<section class="events-panel">
     <EventFilters
         dateFilter={effectiveDateFilter}
         eventType={Astro.url.searchParams.get('event_type') ?? ''}
@@ -58,4 +59,4 @@ const { events, total, totalPages } = await getEvents(filters, { page, perPage: 
         hxTarget="#events__listing"
         hxInclude="#event-filters-form"
     />
-</events-panel>
+</section>

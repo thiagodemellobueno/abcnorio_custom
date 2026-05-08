@@ -1,11 +1,16 @@
 ---
 export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'events'].includes(process.env.SCOPE || 'full');
-
+import { Debug } from "astro:components";
 import Layout from "../../layouts/sidebar.astro";
 import Block from "../../components/wp-blocks/generic-block.astro";
+import ImageBlock from "../../components/wp-blocks/image.astro";
 import ATC from "../../components/AddToCalendar/AddToCalendar.astro";
+
+import "./_event.scss";
+
 import { SITE_URL, REST_PATH } from "@util/paths.js";
 import { buildPostSeo } from "@util/seo.js";
+import { formatEventDate } from "@util/dates.js";
 import { getCollection } from "astro:content";
 import { collectionPaths } from "@util/static-paths.js";
 import { fetchWpPost } from "@util/fetch-data.js";
@@ -16,113 +21,39 @@ const post: any = await fetchWpPost(
   (Astro.props as any)?.post,
 );
 
-const blocks: any[] = post?.blocks ?? [];
+const blocks: any[] = post.blocks;
 const seo = buildPostSeo({
   post,
   siteUrl: SITE_URL,
   pathname: `/events/${slug}/`,
 });
 
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function formatEventDate(raw: string) {
-  if (!raw) return null;
-  const d = new Date(raw);
-  if (Number.isNaN(d.getTime())) return null;
-
-  const weekday = weekdays[d.getDay()];
-  const month = months[d.getMonth()];
-  const day = d.getDate();
-  const year = d.getFullYear();
-  const hour = d.getHours() % 12 || 12;
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-  const ampm = d.getHours() < 12 ? "AM" : "PM";
-
-  return {
-    datetime: raw.replace(" ", "T"),
-    dateLabel: `${weekday}, ${month} ${day}, ${year}`,
-    timeLabel: `@ ${hour}:${minutes} ${ampm}`,
-  };
-}
-
-const parseDate = (aDate: any) => {
-  const d = new Date(aDate);
-  if (Number.isNaN(d.getTime())) {
-    return null;
-  }
-
-  const year = d.getFullYear();
-  const monthIndex = d.getMonth();
-  const date = d.getDate().toString().padStart(2, "0");
-  const hours = d.getHours();
-  const minutes = d.getMinutes();
-  const ampm = hours < 12 ? "AM" : "PM";
-  const weekday = d.getDay();
-
-  return {
-    year: year.toString(),
-    date,
-    ampm,
-    display_month: months[monthIndex],
-    display_hours: hours % 12 || 12,
-    display_minutes: minutes.toString().padStart(2, "0"),
-    weekday: weekdays[weekday],
-  };
-};
-
-const meta = post?.meta || {};
-const acf =
-  post?.acf && typeof post.acf === "object" && !Array.isArray(post.acf)
-    ? post.acf
-    : {};
-const readField = (key: string) => meta?.[key] ?? acf?.[key] ?? "";
-const startDate = readField("event_start_date");
-const endDate = readField("event_end_date");
-const location = readField("event_venue_name");
-const timezone = readField("event_timezone");
-const venueName = readField("event_venue_name");
-const venueAddress = readField("event_venue_address");
-const ticketsURL = readField("event_tickets_url");
-const eventDetails: Array<{ detail_label?: string; detail_text?: string }> =
-  Array.isArray(acf?.event_details) ? acf.event_details : [];
-const featuredImage = post?._embedded?.["wp:featuredmedia"]?.[0];
-const featuredImageUrl = featuredImage?.url ?? "";
-const featuredImageAlt = featuredImage?.alt_text ?? "";
-const eventTypeIds: number[] = Array.isArray(post?.["event-types"])
-  ? post["event-types"]
-  : [];
+const startDate: string = post.acf.event_start_date;
+const endDate: string   = post.acf.event_end_date;
+const venueName: string    = post.acf.event_venue_name;
+const venueAddress: string = post.acf.event_venue_address;
+const ticketsURL: string   = post.acf.event_tickets_url;
+const timezone: string     = post.acf.event_timezone;
+const eventDetails: Array<{ detail_label?: string; detail_text?: string }> = post.acf.event_details ?? [];
+const featuredImage = post._embedded?.["wp:featuredmedia"]?.[0];
+const eventTypeIds: number[] = post["event-types"];
 const eventTypeTerms = await getCollection('event_types');
 const eventTypeNames = eventTypeTerms
   .filter((entry: any) => eventTypeIds.includes(entry.data?.id))
-  .map((entry: any) => entry.data?.name)
+  .map((entry: any) => ({ slug: entry.data?.slug, name: entry.data?.name }))
   .filter(Boolean);
 
-let display_date;
-let display_time;
 const startFormatted = formatEventDate(startDate);
-const endFormatted = formatEventDate(endDate);
+const endFormatted   = formatEventDate(endDate);
 
-if (startDate && endDate) {
-  const sd = parseDate(startDate);
-  const ed = parseDate(endDate);
-  if (sd && ed) {
-    display_date = `${sd.weekday}, ${sd.display_month} ${sd.date}, ${sd.year}`;
-    display_time = `@ ${sd.display_hours}:${sd.display_minutes} ${sd.ampm} - ${ed.display_hours}:${ed.display_minutes} ${ed.ampm}`;
-  }
+let display_date: string | undefined;
+let display_time: string | undefined;
+if (startFormatted && !endFormatted) {
+  display_date = startFormatted.label_date;
+  display_time = `@ ${startFormatted.label_time} ${startFormatted.ampm}`;
+} else if (startFormatted && endFormatted) {
+  display_date = `${startFormatted.label_date} - ${endFormatted.label_date}`;
+  display_time = `@ ${startFormatted.label_time} ${startFormatted.ampm} - ${endFormatted.label_time} ${endFormatted.ampm}`;
 }
 
 export async function getStaticPaths() {
@@ -146,7 +77,7 @@ export async function getStaticPaths() {
       )
     }
 
-    <h1 set:html={post?.title?.rendered} />
+    <h1 set:html={post.title.rendered} />
 
     {
       (venueName || venueAddress) && (
@@ -156,19 +87,26 @@ export async function getStaticPaths() {
         </div>
       )
     }
+
+    {
+      featuredImage?.url && (
+      <div class="event__poster">
+        <ImageBlock
+          loading="eager"
+          decoding="async"
+          attributes={{
+            url: featuredImage.media_details.sizes.medium_large.source_url,
+            alt: featuredImage.alt_text,
+            caption: featuredImage.caption?.rendered,
+            media_details: featuredImage.media_details,
+          }}
+        />
+        </div>
+      )
+    }
   </header>
 
   <article slot="main">
-    {
-      featuredImageUrl && (
-        <img
-          src={featuredImageUrl}
-          alt={featuredImageAlt}
-          loading="eager"
-          decoding="async"
-        />
-      )
-    }
     {
       blocks.map((block: any) => (
         <Block
@@ -185,11 +123,11 @@ export async function getStaticPaths() {
       startDate && (
         <ATC
           event={{
-            title: post?.title?.rendered ?? "",
-            description: post?.excerpt?.rendered ?? "",
+            title: post.title.rendered,
+            description: post.excerpt.rendered,
             event_start_date: startDate,
-            event_end_date: endDate || startDate,
-            event_venue_name: location,
+            event_end_date: endDate,
+            event_venue_name: venueName,
             event_timezone: timezone,
           }}
         />
@@ -199,8 +137,8 @@ export async function getStaticPaths() {
     {
       eventTypeNames.length > 0 && (
         <div class="event-types-taxonomy">
-            {eventTypeNames.map((name: string) => (
-              <a href="#">{name}</a>
+            {eventTypeNames.map((term) => (
+              <a href={`/events/event-type/${term.slug}/`}>{term.name}</a>
             ))}
         </div>
       )
@@ -208,12 +146,10 @@ export async function getStaticPaths() {
 
     {
       ticketsURL && (
-        <div class="end-date">
-          <strong>Tickets:</strong>{" "}
-          <a href={ticketsURL} target="_blank" rel="noopener noreferrer">
-            {ticketsURL}
-          </a>
-        </div>
+        <button class="end-date" href={ticketsURL} target="_blank" rel="noopener noreferrer">  
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Tickets SVG Icon</title><path fill="currentColor" d="M21 8h-2V3a1 1 0 0 0-1.37-.93l-15 6c-.09.04-.16.1-.24.16c-.03.02-.06.03-.09.06c-.04.04-.05.08-.08.12c-.05.06-.1.12-.13.19c-.01.02 0 .05-.02.08c-.03.1-.06.2-.06.31v3.55c0 .48.33.89.8.98a1.499 1.499 0 0 1 0 2.94c-.47.09-.8.5-.8.98v3.55c0 .55.45 1 1 1h18c.55 0 1-.45 1-1v-3.55c0-.48-.33-.89-.8-.98a1.499 1.499 0 0 1 0-2.94c.47-.09.8-.5.8-.98V8.99c0-.55-.45-1-1-1Zm-4 0H8.19L17 4.48zm3 3.84c-1.2.57-2 1.79-2 3.16s.8 2.59 2 3.16V20h-4v-2h-1v2H4v-1.84c1.2-.57 2-1.79 2-3.16s-.8-2.59-2-3.16V10h11v1h1v-1h4z"/><path fill="currentColor" d="M15 12h1v2h-1zm0 3h1v2h-1z"/></svg>
+          <span class="ui-label">Get Tickets</span>
+        </button>
       )
     }
 
@@ -233,23 +169,3 @@ export async function getStaticPaths() {
     }
   </aside>
 </Layout>
-<style>
-  .event-types-taxonomy {
-    margin-top: 2rem;
-    padding: 0.5rem;
-    background-color: var(--color-panel-bg);
-    border-radius: 0.5rem;
-    border: 2px solid #dedede;
-    a {
-      background-color: var(--color-text);
-      display: inline-block;
-      color: #dedede;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      text-decoration: none;
-      margin-right: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-  }
-</style>

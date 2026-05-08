@@ -1,7 +1,7 @@
 ---
 export const prerender = ['development', 'staging'].includes(String(process.env.MODE || '').toLowerCase()) ? false : ['full', 'about'].includes(process.env.SCOPE || 'full');
 
-import Layout from '@layouts/page.astro';
+import Layout from '@layouts/sidebar.astro';
 import Block from '@components/wp-blocks/generic-block.astro';
 import { SITE_URL, REST_PATH } from '@util/paths.js';
 import { buildPostSeo } from '@util/seo.js';

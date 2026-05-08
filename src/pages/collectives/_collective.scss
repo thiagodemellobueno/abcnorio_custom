@@ -1,0 +1,24 @@
+@use "@tokens/colors";
+@use "@tokens/breakpoints";
+@use "@mixins/layout";
+
+.sidebar-layout {
+  @include layout.sidebar();
+}
+
+.events.teaser {
+  max-width: 40%;
+}
+
+@media (min-width: breakpoints.get-breakpoint(sm)) {
+  .events.teaser {
+    max-width: 33.333%;
+  }
+}
+
+@media (min-width: breakpoints.get-breakpoint(md)) {
+
+  .events.teaser {
+    max-width: 20%;
+  }
+}

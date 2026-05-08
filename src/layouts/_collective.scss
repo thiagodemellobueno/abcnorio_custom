@@ -1,7 +1,0 @@
-@use "@tokens/colors";
-@use "@tokens/breakpoints";
-@use "@mixins/layout";
-
-.sidebar-layout > .wrapper {
-  @include layout.sidebar();
-}

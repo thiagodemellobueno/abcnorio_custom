@@ -1,0 +1,45 @@
+@use "@mixins/layout";
+@use "@tokens/breakpoints";
+
+.sidebar-layout {
+  @include layout.sidebar();
+  gap: 0;
+
+   > header, > aside, > article {
+    position: relative;
+    background-color: var(--color-panel);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    padding: 2rem;
+  }
+
+  > aside, > article {
+    z-index: 5;
+  }
+
+  > header {
+  }
+
+  > aside {
+  }
+
+  > article {
+    overflow-y: hidden;
+
+    p, h2, h3, h4, h5, blockquote, ul, li {
+      max-width: 44rem;
+    }
+  }
+
+  @media (min-width: breakpoints.get-breakpoint(sm)) {
+    gap: 0;
+  }
+
+  @media (min-width: breakpoints.get-breakpoint(md)) {
+    > aside {
+      box-shadow: none;
+      background-color: transparent;
+      padding: 0;
+    }
+  }
+}
+

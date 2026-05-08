@@ -35,13 +35,13 @@ for (const item of itemsById.values()) {
 }
 ---
 
+{
+    Astro.url && Astro.url.pathname === "/search" ? null : (
+        <SearchField dest="search" />
+    )
+}
 <nav-menu>
-    <nav aria-expanded="false" aria-label="Primary">
-        {
-            Astro.url && Astro.url.pathname === "/search" ? null : (
-                <SearchField dest="search" />
-            )
-        }
+    <nav aria-label="Primary">
         <button
             class="nav_toggle"
             type="button"
@@ -88,7 +88,7 @@ for (const item of itemsById.values()) {
         </button>
 
         <button
-            class="search_toggle"
+            class="search__toggle"
             type="button"
             aria-label="Toggle search field"
             aria-controls="search-field"
@@ -174,7 +174,7 @@ for (const item of itemsById.values()) {
             const toggle = this.querySelector(".nav_toggle");
             const nav = this.querySelector("nav");
             const subnavToggles = this.querySelectorAll(".subnav__toggle");
-            const searchToggle = this.querySelector(".search_toggle");
+            const searchToggle = this.querySelector(".search__toggle");
             searchToggle?.addEventListener("click", (e) => {
                 e.preventDefault();
                 const isExpanded =
@@ -195,7 +195,7 @@ for (const item of itemsById.values()) {
                     const isExpanded =
                         toggle.getAttribute("aria-expanded") === "true";
                     toggle.setAttribute("aria-expanded", String(!isExpanded));
-                    nav.setAttribute("aria-expanded", String(!isExpanded));
+                    nav.classList.toggle("active");
                 });
             }
 

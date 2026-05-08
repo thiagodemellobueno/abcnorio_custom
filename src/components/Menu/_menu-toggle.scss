@@ -1,4 +1,5 @@
 @mixin styles {
+
     .nav_toggle {
         position: fixed;
         top: 1.2rem;
@@ -12,18 +13,20 @@
         border-radius: 50%;
         border: 0.25rem solid var(--color-text);
         background-color: transparent;
+        background-color: var(--color-page-bg);
 
         svg {
             position: relative;
             top: -0.25rem;
-            // max-width: 120%;
-            // vertical-align: middle;
+            left: -0.125rem;
             text-align: center;
+            max-width: 120%;
         }
+
         .line {
             transform-box: fill-box;
             transform-origin: center;
-            transition: transform 220ms ease, opacity 180ms linear, color 180ms linear;
+            transition: transform 150ms ease, opacity 150ms linear, color 150ms linear;
         }
  
         &[aria-expanded="true"] .top {
@@ -45,14 +48,17 @@
 
         &[aria-expanded="true"] {
             color: var(--color-page-bg);
-            border-color: --var(--color-page-bg);
+            border-color: var(--color-page-bg);
+            background-color: var(--color-text);
+
             .top,
             .bottom {
                 fill: var(--color-page-bg);
             }
+
             svg {
                 path { 
-                    fill: --var(--color-page-bg);
+                    fill: var(--color-page-bg);
                 }
             }
         }

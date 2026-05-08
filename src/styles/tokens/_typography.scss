@@ -1,5 +1,6 @@
 @charset "UTF-8";
 @use "sass:map";
+@use "@tokens/breakpoints";
 
 $type-ratios: (
   "minorSecond": 1.067,
@@ -38,10 +39,19 @@ h4 {
 
 .ui-label {
     font-size: 1rem;
+    line-height: 2;
 }
 
 h1 {
-   font-size: #{3 * $type-size-ratio}rem;
+    line-height: 1.1;
+    font-size: #{2.5 * $type-size-ratio}rem;
+    @media screen and (min-width: breakpoints.get-breakpoint(sm)) {
+        font-size: #{2 * $type-size-ratio}rem;
+    }
+
+    @media screen and (min-width: breakpoints.get-breakpoint(md)) {
+        font-size: #{3 * $type-size-ratio}rem;
+    }
 
 }
 

@@ -1,0 +1,40 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  pageOneHref: string;
+  pageHref: (page: number) => string;
+}
+
+const { currentPage, totalPages, pageOneHref, pageHref } = Astro.props;
+
+const hrefForPage = (p: number) => p === 1 ? pageOneHref : pageHref(p);
+---
+
+{totalPages > 1 && (
+  <nav class="pagination" aria-label="Pagination">
+    <ul>
+      {currentPage > 1 && (
+        <li>
+          <a href={hrefForPage(currentPage - 1)}>&laquo; Prev</a>
+        </li>
+      )}
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+        <li>
+          <a
+            href={hrefForPage(p)}
+            aria-current={p === currentPage ? 'page' : undefined}
+            class={p === currentPage ? 'is-current' : ''}
+          >
+            {p}
+          </a>
+        </li>
+      ))}
+      {currentPage < totalPages && (
+        <li>
+          <a href={hrefForPage(currentPage + 1)}>Next &raquo;</a>
+        </li>
+      )}
+    </ul>
+  </nav>
+)}

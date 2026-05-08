@@ -12,31 +12,3 @@ const excerpt = data?.excerpt?.rendered || '';
         <div set:html={ excerpt }></div>
     </a>
 </article>
-<style>
-    article {
-        min-height: 5rem;
-        h2 {
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-        a {
-            border: 1px #030 solid;
-            display: block;
-            padding: 0.875rem;
-            text-decoration: none;
-            font-size: 1rem;
-            color: #090;
-            &:focus,
-            &:hover {
-                color: #0f0;
-                border: 1px #0f0 solid;
-            }
-        }
-        @media (min-width: 900px ) {
-            a {
-                padding: 2rem;
-                font-size: 1.25rem;
-            }
-        }
-    }
-</style>

@@ -2,7 +2,7 @@
 // Check if we're on the dedicated search page (not a sidebar/nav search)
 const isSearchPage = Astro.url?.pathname?.startsWith('/search');
 ---
-<div class="search-field" id="search-field" role="search" aria-label="Site search">
+<div class="search__field" id="search-field" role="search" aria-label="Site search">
     <form id="search-form" action="/search" method="get"
           aria-controls={isSearchPage ? 'search-results' : undefined}
           data-search-api="/search/api"

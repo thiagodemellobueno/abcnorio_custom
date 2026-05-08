@@ -1,13 +1,14 @@
 ---
 import Menu from '@components/Menu/Menu.astro';
 import { fetchMenu } from '@lib/navigation.js';
+import './_header.scss';
 
 /** @type {Array<{ title: string, url: string, target?: string }>} */
 const primaryMenu = await fetchMenu('primary_navigation');
 ---
-<header>
+<header class="site-header">
     <a href="/" class="logo">
-        <img src="/abcnorio-logo.svg" width="128" height="128" alt="ABC No Rio Logo" />
+        <img src="/abcnorio-logo.svg" width="92" height="92" alt="ABC No Rio Logo" />
     </a>
     {primaryMenu.length > 0 && (
         <Menu menuData={primaryMenu} />
@@ -34,25 +35,3 @@ const primaryMenu = await fetchMenu('primary_navigation');
 
 
 </header>
-<style>
-    header {
-        text-align: center;
-        padding: 1rem 0;
-        pre {
-            font-size: 5px;
-            @media (min-width: 900px) {
-                font-size: 12px;
-            }
-        }
-        a.logo {
-            display: inline-block;
-            text-decoration: none;
-            &:hover {
-                color: #090;
-            }
-        }
-        @media (min-width: 600px) {
-            padding: 1rem;
-        }
-    }
-</style>
